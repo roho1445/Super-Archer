@@ -24,6 +24,7 @@ export class Final_Project extends Scene {
             planet3: new defs.Subdivision_Sphere(3),
             planet4: new defs.Subdivision_Sphere(4),
             moon: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(1),
+            obstacle: new defs.Rounded_Capped_Cylinder(15, 15,  [[0, 15], [0, 15]]),
         };
 
         // *** Materials
@@ -39,6 +40,8 @@ export class Final_Project extends Scene {
 
             sun_shader: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1, color: hex_color('#ffffff')}),
+            obstacle_shader: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 0, color: hex_color('#ADD8E6')}),
             planet1_shader: new Material(new defs.Phong_Shader(),
                 {ambient: 0, diffusivity: 1, color: hex_color('#808080'), specularity: 0}),
             planet2_shader_gouraud: new Material(new Gouraud_Shader(),
@@ -53,7 +56,7 @@ export class Final_Project extends Scene {
                 {ambient: 1, specularity: 1, color: hex_color('#ffffff')})
         }
 
-        this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
+        this.initial_camera_location = Mat4.look_at(vec3(0, 0, 20), vec3(0, 0, 0), vec3(0, 1, 0));
     }
 
     make_control_panel() {
@@ -77,17 +80,22 @@ export class Final_Project extends Scene {
             // Define the global camera and projection matrices, which are stored in program_state.
             program_state.set_camera(this.initial_camera_location);
         }
-
+        let model_transform = Mat4.identity();
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, .1, 1000);
+
+
+        //this.shapes.obstacle.draw(context, program_state, model_transform, this.materials.sun_shader);
 
         // TODO: Create Planets (Requirement 1)
         // this.shapes.[XXX].draw([XXX]) // <--example
 
+
         // TODO:  Fill in matrix operations and drawing code to draw the solar system scene (Requirements 3 and 4)
+
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         const yellow = hex_color("#fac91a");
-        let model_transform = Mat4.identity();
+
         const period = 10;
         const max_scale = 3;
         const min_scale = 1;
@@ -109,7 +117,7 @@ export class Final_Project extends Scene {
 
         let sun_transform = model_transform.times(Mat4.scale(radius, radius, radius));
         //this.shapes.torus.draw(context, program_state, model_transform, this.materials.test.override({color: yellow}));
-        this.shapes.sun.draw(context, program_state, sun_transform, this.materials.sun_shader.override({color: sun_color}));
+        //this.shapes.sun.draw(context, program_state, sun_transform, this.materials.sun_shader.override({color: sun_color}));
 
         let p1_transform = model_transform.times(Mat4.translation(-1*5*Math.cos(t), 0, 5*Math.sin(t)));
         let p2_transform = model_transform.times(Mat4.translation(-1*9*Math.cos(0.80*t), 0,9*Math.sin(0.80*t)));
@@ -122,7 +130,26 @@ export class Final_Project extends Scene {
         let swampy_green_blue = hex_color("#80FFFF");
         let muddy_brown_orange = hex_color("#B08040");
         let soft_light_blue = hex_color("#ADD8E6");
+        let obstacle_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0)).times(Mat4.scale(1,1,5));
 
+
+        let left_to_right_obstacle = obstacle_transform.times(Mat4.translation(15*Math.cos((Math.PI/5)*t), 0, 0 ));
+        let right_to_left_obstacle = obstacle_transform.times(Mat4.translation(-15*Math.cos((Math.PI/5)*t), 0, 0 ));
+
+        let obstacle_1 = left_to_right_obstacle.times(Mat4.translation(0,-5,0));
+        let obstacle_2 = right_to_left_obstacle.times(Mat4.translation(0,-10,0));
+        let obstacle_3 = left_to_right_obstacle.times(Mat4.translation(0,-15,0));
+        let obstacle_4 = right_to_left_obstacle.times(Mat4.translation(0,-20,0));
+
+        this.shapes.obstacle.draw(context, program_state, obstacle_1, this.materials.obstacle_shader);
+        this.shapes.obstacle.draw(context, program_state, obstacle_2, this.materials.obstacle_shader);
+        this.shapes.obstacle.draw(context, program_state, obstacle_3, this.materials.obstacle_shader);
+        this.shapes.obstacle.draw(context, program_state, obstacle_4, this.materials.obstacle_shader);
+
+        //this.shapes.obstacle.draw(context, program_state, obstacle_transform, this.materials.obstacle_shader);
+
+
+        /*
         this.shapes.planet1.draw(context, program_state, p1_transform, this.materials.planet1_shader);
 
         if (Math.floor(t) % 2 === 1) {
@@ -156,6 +183,8 @@ export class Final_Project extends Scene {
             program_state.camera_inverse = this.attached().map((x,i) =>
                 Vector.from(program_state.camera_inverse[i]).mix(x, 0.1));
         }
+
+         */
     }
 
 }
