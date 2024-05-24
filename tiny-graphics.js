@@ -1191,7 +1191,7 @@ const Shader = tiny.Shader =
     }
 
 
-const Texture = tiny.Texture =
+export const Texture = tiny.Texture =
     class Texture extends Graphics_Card_Object {
         // **Texture** wraps a pointer to a new texture image where
         // it is stored in GPU memory, along with a new HTML image object.

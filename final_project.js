@@ -1,4 +1,5 @@
 import {defs, tiny} from './examples/common.js';
+//import {Texture} from './tiny-graphics';
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene,
@@ -28,6 +29,10 @@ export class Final_Project extends Scene {
             cube: new defs.Cube(),
         };
 
+        this.images = {
+            grass: "assets/grass_texture.jpg",
+        };
+
         // *** Materials
         this.materials = {
             test: new Material(new defs.Phong_Shader(),
@@ -41,6 +46,8 @@ export class Final_Project extends Scene {
 
             sun_shader: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1, color: hex_color('#ffffff')}),
+            //grass_shader: new Material(new defs.Phong_Shader(),
+             //   {ambient: 1, diffusivity: 1, color: hex_color('#ffffff'), texture: new Texture(this.images.grass)}),
             obstacle_shader: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, color: hex_color('#ADD8E6')}),
             planet1_shader: new Material(new defs.Phong_Shader(),
@@ -60,18 +67,23 @@ export class Final_Project extends Scene {
         this.initial_camera_location = Mat4.look_at(vec3(0, 0, 20), vec3(0, 0, 0), vec3(0, 1, 0));
     }
 
+
     make_control_panel() {
         // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
-        this.key_triggered_button("View solar system", ["Control", "0"], () => this.attached = () => this.solar_system);
+        this.key_triggered_button("Shoot Arrow", ["Control", "0"], () => this.attached = () => this.solar_system);
         this.new_line();
-        this.key_triggered_button("Attach to planet 1", ["Control", "1"], () => this.attached = () => this.planet_1);
+        /*
+        /this.key_triggered_button("Attach to planet 1", ["Control", "1"], () => this.attached = () => this.planet_1);
         this.key_triggered_button("Attach to planet 2", ["Control", "2"], () => this.attached = () => this.planet_2);
         this.new_line();
         this.key_triggered_button("Attach to planet 3", ["Control", "3"], () => this.attached = () => this.planet_3);
         this.key_triggered_button("Attach to planet 4", ["Control", "4"], () => this.attached = () => this.planet_4);
         this.new_line();
         this.key_triggered_button("Attach to moon", ["Control", "m"], () => this.attached = () => this.moon);
+    */
     }
+
+
 
     display(context, program_state) {
         // display():  Called once per frame of animation.
@@ -132,16 +144,16 @@ export class Final_Project extends Scene {
         let muddy_brown_orange = hex_color("#B08040");
         let soft_light_blue = hex_color("#ADD8E6");
         //this.shapes.cylinder.draw(context,program_state, model_transform, this.materials.test.override({color: hex_color("ff0000")}));
-        let obstacle_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0)).times(Mat4.scale(1,1,5));
+        let obstacle_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0)).times(Mat4.scale(1,1,25));
 
 
         let left_to_right_obstacle = obstacle_transform.times(Mat4.translation(15*Math.cos((Math.PI/5)*t), 0, 0 ));
         let right_to_left_obstacle = obstacle_transform.times(Mat4.translation(-15*Math.cos((Math.PI/5)*t), 0, 0 ));
 
-        let obstacle_1 = left_to_right_obstacle.times(Mat4.translation(0,-5,0));
-        let obstacle_2 = right_to_left_obstacle.times(Mat4.translation(0,-10,0));
-        let obstacle_3 = left_to_right_obstacle.times(Mat4.translation(0,-15,0));
-        let obstacle_4 = right_to_left_obstacle.times(Mat4.translation(0,-20,0));
+        let obstacle_1 = left_to_right_obstacle.times(Mat4.translation(0,-5,0.3));
+        let obstacle_2 = right_to_left_obstacle.times(Mat4.translation(0,-10,0.3));
+        let obstacle_3 = left_to_right_obstacle.times(Mat4.translation(0,-15,0.3));
+        let obstacle_4 = right_to_left_obstacle.times(Mat4.translation(0,-20,0.3));
         //sun
         const sun_matrix = model_transform.times(Mat4.translation(-12,5.5,0).times(Mat4.scale(1.7,1.7,1.7)));
         this.shapes.sun.draw(context,program_state, sun_matrix, this.materials.sun_shader.override({color: hex_color("ffff00")}));
@@ -151,7 +163,7 @@ export class Final_Project extends Scene {
         this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-25))).times(Mat4.scale(5,5,0)), this.materials.obstacle_shader.override({color: hex_color("0000ff")}));
         this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-25))).times(Mat4.scale(7,7,0)), this.materials.obstacle_shader.override({color: hex_color("000000")}));
         //grass
-        this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(0,-10,6)).times(Mat4.scale(100,1,37)), this.materials.obstacle_shader.override({color: hex_color("04Af70")}));        
+        this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(0,-10,6)).times(Mat4.scale(100,1,37)), this.materials.obstacle_shader.override({color: hex_color("04Af70")}));
         //obstacles
         this.shapes.obstacle.draw(context, program_state, obstacle_1, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
         this.shapes.obstacle.draw(context, program_state, obstacle_2, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
