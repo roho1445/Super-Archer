@@ -25,6 +25,7 @@ export class Final_Project extends Scene {
             planet4: new defs.Subdivision_Sphere(4),
             moon: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(1),
             obstacle: new defs.Rounded_Capped_Cylinder(15, 15,  [[0, 15], [0, 15]]),
+            cube: new defs.Cube(),
         };
 
         // *** Materials
@@ -111,9 +112,9 @@ export class Final_Project extends Scene {
         );
 
         // TODO: Lighting (Requirement 2)
-        const light_position = vec4(0, 0, 0, 1);
+        const light_position = vec4(5, 5, 9999999, 1);
         // The parameters of the Light are: position, color, size
-        program_state.lights = [new Light(light_position, sun_color, 10**radius)];
+        program_state.lights = [new Light(light_position, hex_color("ffffff"), 10**radius)];
 
         let sun_transform = model_transform.times(Mat4.scale(radius, radius, radius));
         //this.shapes.torus.draw(context, program_state, model_transform, this.materials.test.override({color: yellow}));
@@ -130,6 +131,7 @@ export class Final_Project extends Scene {
         let swampy_green_blue = hex_color("#80FFFF");
         let muddy_brown_orange = hex_color("#B08040");
         let soft_light_blue = hex_color("#ADD8E6");
+        //this.shapes.cylinder.draw(context,program_state, model_transform, this.materials.test.override({color: hex_color("ff0000")}));
         let obstacle_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0)).times(Mat4.scale(1,1,5));
 
 
@@ -140,11 +142,28 @@ export class Final_Project extends Scene {
         let obstacle_2 = right_to_left_obstacle.times(Mat4.translation(0,-10,0));
         let obstacle_3 = left_to_right_obstacle.times(Mat4.translation(0,-15,0));
         let obstacle_4 = right_to_left_obstacle.times(Mat4.translation(0,-20,0));
+        //sun
+        const sun_matrix = model_transform.times(Mat4.translation(-12,5.5,0).times(Mat4.scale(1.7,1.7,1.7)));
+        this.shapes.sun.draw(context,program_state, sun_matrix, this.materials.sun_shader.override({color: hex_color("ffff00")}));
+        //target
+        this.shapes.sun.draw(context,program_state, (model_transform.times(Mat4.translation(0,0,-25)).times(Mat4.scale(1,1,0))), this.materials.obstacle_shader.override({color: hex_color("ff0000")}))
+        this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-25)).times(Mat4.scale(3,3,0))), this.materials.obstacle_shader.override({color: hex_color("00ff00")}));
+        this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-25))).times(Mat4.scale(5,5,0)), this.materials.obstacle_shader.override({color: hex_color("0000ff")}));
+        this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-25))).times(Mat4.scale(7,7,0)), this.materials.obstacle_shader.override({color: hex_color("000000")}));
+        //grass
+        this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(0,-10,6)).times(Mat4.scale(100,1,37)), this.materials.obstacle_shader.override({color: hex_color("04Af70")}));        
+        //obstacles
+        this.shapes.obstacle.draw(context, program_state, obstacle_1, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
+        this.shapes.obstacle.draw(context, program_state, obstacle_2, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
+        this.shapes.obstacle.draw(context, program_state, obstacle_3, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
+        this.shapes.obstacle.draw(context, program_state, obstacle_4, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
+        
+        //this.shapes.cylinder.draw(context, program_state, obstacle_1.times(Mat4.translation(0,-30,0)), this.materials.test.override({color: hex_color("ff0000")}));
+        //this.shapes.cylinder.draw(context,program_state, model_transform.times(Mat4.scale(2,2,1)), this.materials.test.override({color: hex_color("00ff00")}));
 
-        this.shapes.obstacle.draw(context, program_state, obstacle_1, this.materials.obstacle_shader);
-        this.shapes.obstacle.draw(context, program_state, obstacle_2, this.materials.obstacle_shader);
-        this.shapes.obstacle.draw(context, program_state, obstacle_3, this.materials.obstacle_shader);
-        this.shapes.obstacle.draw(context, program_state, obstacle_4, this.materials.obstacle_shader);
+        //this.shapes.cylinder.draw(context,program_state, model_transform.times(Mat4.scale(4,4,1)), this.materials.test.override({color: hex_color("ff0000")}));
+        //this.shapes.cylinder.draw(context,program_state, model_transform.times(Mat4.scale(6,6,1)), this.materials.test.override({color: hex_color("0000ff")}));
+        //this.shapes.cylinder.draw(context,program_state, model_transform.times(Mat4.scale(8,8,1)), this.materials.test.override({color: hex_color("000000")}));
 
         //this.shapes.obstacle.draw(context, program_state, obstacle_transform, this.materials.obstacle_shader);
 

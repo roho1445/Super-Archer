@@ -1303,7 +1303,7 @@ const Webgl_Manager = tiny.Webgl_Manager =
 
             this.set_size(dimensions);
 
-            gl.clearColor.apply(gl, background_color);           // Tell the GPU which color to clear the canvas with each frame.
+            gl.clearColor.apply(gl, hex_color("ADD8E6"));           // Tell the GPU which color to clear the canvas with each frame.
             gl.getExtension("OES_element_index_uint");           // Load an extension to allow shapes with more than 65535 vertices.
             gl.enable(gl.DEPTH_TEST);                            // Enable Z-Buffering test.
             // Specify an interpolation method for blending "transparent" triangles over the existing pixels:
