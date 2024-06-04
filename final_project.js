@@ -1,9 +1,12 @@
 import {defs, tiny} from './examples/common.js';
+//import {Texture} from "./tiny-graphics";
 //import {Texture} from './tiny-graphics';
 
 const {
-    Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene,
+    Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
 } = tiny;
+
+const {Cube, Axis_Arrows, Textured_Phong} = defs
 
 export class Final_Project extends Scene {
     constructor() {
@@ -30,7 +33,7 @@ export class Final_Project extends Scene {
         };
 
         this.images = {
-            grass: "assets/grass_texture.jpg",
+            grass: "assets/grass_texture.png",
         };
 
         // *** Materials
@@ -44,26 +47,18 @@ export class Final_Project extends Scene {
             // TODO:  Fill in as many additional material objects as needed in this key/value table.
             //        (Requirement 4)
 
-            sun_shader: new Material(new defs.Phong_Shader(),
+            sun_shader: new Material(new Textured_Phong(),
                 {ambient: 1, diffusivity: 1, color: hex_color('#ffffff')}),
-            //grass_shader: new Material(new defs.Phong_Shader(),
-             //   {ambient: 1, diffusivity: 1, color: hex_color('#ffffff'), texture: new Texture(this.images.grass)}),
+
+            grass_shader: new Material(new Textured_Phong(),
+               {color: hex_color('#000000'),
+                   ambient: 1, diffusivity: 0.1, specularity: 0.1,
+                   texture: new Texture(this.images.grass),}),
             obstacle_shader: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, color: hex_color('#ADD8E6')}),
-            planet1_shader: new Material(new defs.Phong_Shader(),
-                {ambient: 0, diffusivity: 1, color: hex_color('#808080'), specularity: 0}),
-            planet2_shader_gouraud: new Material(new Gouraud_Shader(),
-                {ambient: 0, diffusivity: 0.2, color: hex_color('#80ffff'), specularity: 1}),
-            planet2_shader_phong: new Material(new defs.Phong_Shader(),
-                {ambient: 0, diffusivity: 0.2, color: hex_color('#80ffff'), specularity: 1}),
-            planet3_shader: new Material(new defs.Phong_Shader(),
-                {ambient: 0, diffusivity: 1, color: hex_color('#b08040'), specularity: 1}),
-            planet4_shader: new Material(new defs.Phong_Shader(),
-                {ambient: 0, color: hex_color('#ADD8E6'), specularity: 1, smoothness: 40}),
-            moon_shader: new Material(new defs.Phong_Shader(),
-                {ambient: 1, specularity: 1, color: hex_color('#ffffff')})
         }
 
+        this.shapes.cube.arrays.texture_coord = this.shapes.cube.arrays.texture_coord.map(x => x.times(70));
         this.initial_camera_location = Mat4.look_at(vec3(0, 0, 20), vec3(0, 0, 0), vec3(0, 1, 0));
     }
 
@@ -155,7 +150,7 @@ export class Final_Project extends Scene {
         let obstacle_3 = left_to_right_obstacle.times(Mat4.translation(0,-15,0.3));
         let obstacle_4 = right_to_left_obstacle.times(Mat4.translation(0,-20,0.3));
         //sun
-        const sun_matrix = model_transform.times(Mat4.translation(-12,5.5,0).times(Mat4.scale(1.7,1.7,1.7)));
+        const sun_matrix = model_transform.times(Mat4.translation(-40,18,-50).times(Mat4.scale(5,5,5)));
         this.shapes.sun.draw(context,program_state, sun_matrix, this.materials.sun_shader.override({color: hex_color("ffff00")}));
         //target
         this.shapes.sun.draw(context,program_state, (model_transform.times(Mat4.translation(0,0,-25)).times(Mat4.scale(1,1,0))), this.materials.obstacle_shader.override({color: hex_color("ff0000")}))
@@ -163,13 +158,15 @@ export class Final_Project extends Scene {
         this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-25))).times(Mat4.scale(5,5,0)), this.materials.obstacle_shader.override({color: hex_color("0000ff")}));
         this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-25))).times(Mat4.scale(7,7,0)), this.materials.obstacle_shader.override({color: hex_color("000000")}));
         //grass
-        this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(0,-10,6)).times(Mat4.scale(100,1,37)), this.materials.obstacle_shader.override({color: hex_color("04Af70")}));
+        //this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(0,-10,6)).times(Mat4.scale(100,1,37)), this.materials.obstacle_shader.override({color: hex_color("04Af70")}));
+        this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(0,-10,6)).times(Mat4.scale(100,1,37)), this.materials.grass_shader);
+
         //obstacles
         this.shapes.obstacle.draw(context, program_state, obstacle_1, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
         this.shapes.obstacle.draw(context, program_state, obstacle_2, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
         this.shapes.obstacle.draw(context, program_state, obstacle_3, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
         this.shapes.obstacle.draw(context, program_state, obstacle_4, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
-        
+
         //this.shapes.cylinder.draw(context, program_state, obstacle_1.times(Mat4.translation(0,-30,0)), this.materials.test.override({color: hex_color("ff0000")}));
         //this.shapes.cylinder.draw(context,program_state, model_transform.times(Mat4.scale(2,2,1)), this.materials.test.override({color: hex_color("00ff00")}));
 
@@ -413,4 +410,3 @@ class Ring_Shader extends Shader {
         }`;
     }
 }
-
