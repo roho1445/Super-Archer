@@ -1,4 +1,5 @@
 import {defs, tiny} from './examples/common.js';
+import {Text_Line} from './examples/text-demo.js';
 //import {Texture} from "./tiny-graphics";
 //import {Texture} from './tiny-graphics';
 
@@ -30,6 +31,8 @@ export class Final_Project extends Scene {
             moon: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(1),
             obstacle: new defs.Rounded_Capped_Cylinder(15, 15,  [[0, 15], [0, 15]]),
             cube: new defs.Cube(),
+            cone: new defs.Closed_Cone(15,15,[[0,15],[0,15]]),
+            text: new Text_Line(40),
         };
 
         this.images = {
@@ -39,7 +42,7 @@ export class Final_Project extends Scene {
         // *** Materials
         this.materials = {
             test: new Material(new defs.Phong_Shader(),
-                {ambient: .4, diffusivity: .6, color: hex_color("#ffffff")}),
+                {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#ffffff")}),
             test2: new Material(new Gouraud_Shader(),
                 {ambient: .4, diffusivity: .6, color: hex_color("#992828")}),
             ring: new Material(new Ring_Shader(),
@@ -47,8 +50,8 @@ export class Final_Project extends Scene {
             // TODO:  Fill in as many additional material objects as needed in this key/value table.
             //        (Requirement 4)
 
-            sun_shader: new Material(new Textured_Phong(),
-                {ambient: 1, diffusivity: 1, color: hex_color('#ffffff')}),
+            sun_shader: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 1, color: hex_color('#ffff00')}),
 
             grass_shader: new Material(new Textured_Phong(),
                {color: hex_color('#000000'),
@@ -56,10 +59,16 @@ export class Final_Project extends Scene {
                    texture: new Texture(this.images.grass),}),
             obstacle_shader: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, color: hex_color('#ADD8E6')}),
+            text_image: new Material(new defs.Textured_Phong(1), {
+                    ambient: 1, diffusivity: 0, specularity: 0,
+                    texture: new Texture("assets/text.png"),
+                }),
         }
 
         this.shapes.cube.arrays.texture_coord = this.shapes.cube.arrays.texture_coord.map(x => x.times(70));
         this.initial_camera_location = Mat4.look_at(vec3(0, 0, 20), vec3(0, 0, 0), vec3(0, 1, 0));
+        this.period_denominator = 5;
+        this.lives = 3;
     }
 
 
@@ -92,7 +101,7 @@ export class Final_Project extends Scene {
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, .1, 1000);
 
-
+        
         //this.shapes.obstacle.draw(context, program_state, model_transform, this.materials.sun_shader);
 
         // TODO: Create Planets (Requirement 1)
@@ -140,18 +149,19 @@ export class Final_Project extends Scene {
         let soft_light_blue = hex_color("#ADD8E6");
         //this.shapes.cylinder.draw(context,program_state, model_transform, this.materials.test.override({color: hex_color("ff0000")}));
         let obstacle_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0)).times(Mat4.scale(1,1,25));
+        
 
-
-        let left_to_right_obstacle = obstacle_transform.times(Mat4.translation(15*Math.cos((Math.PI/5)*t), 0, 0 ));
-        let right_to_left_obstacle = obstacle_transform.times(Mat4.translation(-15*Math.cos((Math.PI/5)*t), 0, 0 ));
+        let left_to_right_obstacle = obstacle_transform.times(Mat4.translation(15*Math.cos((Math.PI/this.period_denominator)*t), 0, 0 ));
+        let right_to_left_obstacle = obstacle_transform.times(Mat4.translation(-15*Math.cos((Math.PI/this.period_denominator)*t), 0, 0 ));
 
         let obstacle_1 = left_to_right_obstacle.times(Mat4.translation(0,-5,0.3));
         let obstacle_2 = right_to_left_obstacle.times(Mat4.translation(0,-10,0.3));
         let obstacle_3 = left_to_right_obstacle.times(Mat4.translation(0,-15,0.3));
         let obstacle_4 = right_to_left_obstacle.times(Mat4.translation(0,-20,0.3));
         //sun
-        const sun_matrix = model_transform.times(Mat4.translation(-40,18,-50).times(Mat4.scale(5,5,5)));
-        this.shapes.sun.draw(context,program_state, sun_matrix, this.materials.sun_shader.override({color: hex_color("ffff00")}));
+        const sun_matrix = model_transform.times(Mat4.translation(-40,22,-50).times(Mat4.scale(5,5,5)));
+        this.shapes.sun.draw(context,program_state, sun_matrix, this.materials.sun_shader);
+
         //target
         this.shapes.sun.draw(context,program_state, (model_transform.times(Mat4.translation(0,0,-25)).times(Mat4.scale(1,1,0))), this.materials.obstacle_shader.override({color: hex_color("ff0000")}))
         this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-25)).times(Mat4.scale(3,3,0))), this.materials.obstacle_shader.override({color: hex_color("00ff00")}));
@@ -166,6 +176,13 @@ export class Final_Project extends Scene {
         this.shapes.obstacle.draw(context, program_state, obstacle_2, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
         this.shapes.obstacle.draw(context, program_state, obstacle_3, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
         this.shapes.obstacle.draw(context, program_state, obstacle_4, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
+
+        this.shapes.text.set_string("Super Archer", context.context);
+        this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-7,7,0).times(Mat4.scale(1,1,1))), this.materials.text_image);
+        this.shapes.text.set_string("Score: 0", context.context);
+        this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-5,5,0).times(Mat4.scale(0.5,0.5,0.5))), this.materials.text_image);
+        this.shapes.text.set_string("Lives:" + this.lives, context.context);
+        this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(3,5,0).times(Mat4.scale(0.5,0.5,0.5))), this.materials.text_image);
 
         //this.shapes.cylinder.draw(context, program_state, obstacle_1.times(Mat4.translation(0,-30,0)), this.materials.test.override({color: hex_color("ff0000")}));
         //this.shapes.cylinder.draw(context,program_state, model_transform.times(Mat4.scale(2,2,1)), this.materials.test.override({color: hex_color("00ff00")}));
