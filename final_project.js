@@ -69,6 +69,7 @@ export class Final_Project extends Scene {
         this.initial_camera_location = Mat4.look_at(vec3(0, 0, 20), vec3(0, 0, 0), vec3(0, 1, 0));
         this.period_denominator = 5;
         this.lives = 3;
+        this.score = 0;
     }
 
 
@@ -178,12 +179,11 @@ export class Final_Project extends Scene {
         this.shapes.obstacle.draw(context, program_state, obstacle_4, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
 
         this.shapes.text.set_string("Super Archer", context.context);
-        this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-7,7,0).times(Mat4.scale(1,1,1))), this.materials.text_image);
-        this.shapes.text.set_string("Score: 0", context.context);
-        this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-5,5,0).times(Mat4.scale(0.5,0.5,0.5))), this.materials.text_image);
+        this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-7,10,-10).times(Mat4.scale(1,1,1))), this.materials.text_image);
+        this.shapes.text.set_string("Score:" + this.score, context.context);
+        this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-3,8,-10).times(Mat4.scale(0.75,0.75,0.75))), this.materials.text_image);
         this.shapes.text.set_string("Lives:" + this.lives, context.context);
-        this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(3,5,0).times(Mat4.scale(0.5,0.5,0.5))), this.materials.text_image);
-
+        this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(14,10,-10).times(Mat4.scale(0.76,0.76,0.76))), this.materials.text_image);
         //this.shapes.cylinder.draw(context, program_state, obstacle_1.times(Mat4.translation(0,-30,0)), this.materials.test.override({color: hex_color("ff0000")}));
         //this.shapes.cylinder.draw(context,program_state, model_transform.times(Mat4.scale(2,2,1)), this.materials.test.override({color: hex_color("00ff00")}));
 
