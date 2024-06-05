@@ -186,7 +186,9 @@ export class Final_Project extends Scene {
                 this.y_angle -= Math.PI/180;
                 this.right = false;
             }
-            arrow_transform = arrow_transform.times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0)).times(Mat4.translation(0, 0, -1*(t- this.start_time)));
+            arrow_transform = arrow_transform.times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0)).times(Mat4.translation(0, 0, -3*(t- this.start_time)));
+            let camera_position = Mat4.inverse(arrow_transform.times(Mat4.translation(0,0,13)));
+            program_state.set_camera(camera_position);
         }
         else
         {
