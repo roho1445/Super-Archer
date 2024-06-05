@@ -70,16 +70,24 @@ export class Final_Project extends Scene {
         this.period_denominator = 5;
         this.lives = 3;
         this.score = 0;
+        this.y_angle = 0;
+        this.x_angle = 0;
+        this.start = false;
+        this.up = false
+        this.down = false;
+        this.left = false;
+        this.right = false;
+        this.start_time = 0;
     }
 
 
     make_control_panel() {
         // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
-        this.key_triggered_button("Shoot Arrow", ["c"], () => this.attached = () => this.solar_system);
-        this.key_triggered_button("Move Arrow Up", ["i"], () => this.attached = () => this.solar_system);
-        this.key_triggered_button("Move Arrow Down", ["k"], () => this.attached = () => this.solar_system);
-        this.key_triggered_button("Move Arrow Left", ["j"], () => this.attached = () => this.solar_system);
-        this.key_triggered_button("Move Arrow Right", ["l"], () => this.attached = () => this.solar_system);
+        this.key_triggered_button("Shoot Arrow", ["c"], () => this.start = () => true);
+        this.key_triggered_button("Move Arrow Up", ["i"], () => this.up = () => true);
+        this.key_triggered_button("Move Arrow Down", ["k"], () => this.down = () => true);
+        this.key_triggered_button("Move Arrow Left", ["j"], () => this.left = () => true);
+        this.key_triggered_button("Move Arrow Right", ["l"], () => this.right = () => true);
         this.new_line();
     }
 
@@ -155,13 +163,44 @@ export class Final_Project extends Scene {
         let obstacle_3 = left_to_right_obstacle.times(Mat4.translation(0,-15,0.3));
         let obstacle_4 = right_to_left_obstacle.times(Mat4.translation(0,-20,0.3));
         //arrow
-        let arrow_transform = model_transform.times(Mat4.rotation(-Math.PI/18, 1, 0, 0));
+        let arrow_transform = model_transform;
+        if(this.start)
+        {
+            if(this.up)
+            {
+                this.x_angle += Math.PI/180;
+                this.up = false;
+            }
+            if(this.down)
+            {
+                this.x_angle -= Math.PI/180;
+                this.down = false;
+            }
+            if(this.left)
+            {
+                this.y_angle += Math.PI/180;
+                this.left = false;
+            }
+            if(this.right)
+            {
+                this.y_angle -= Math.PI/180;
+                this.right = false;
+            }
+            arrow_transform = arrow_transform.times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0)).times(Mat4.translation(0, 0, -1*(t- this.start_time)));
+        }
+        else
+        {
+            this.start_time = t;
+        }
+
+
         let arrow_cone_transform = arrow_transform.times(Mat4.translation(0, -2, -3)).times(Mat4.rotation(Math.PI, 1, 0, 0)).times(Mat4.scale(0.4, 0.4, 0.8));
         let arrow_body_transform = arrow_transform.times(Mat4.translation(0, -2, 0)).times(Mat4.scale(0.1, 0.1, 6));
         this.shapes.cone.draw(context,program_state, arrow_cone_transform, this.materials.sun_shader.override({color: hex_color("#B2B4B6")}));
         this.shapes.obstacle.draw(context,program_state, arrow_body_transform , this.materials.sun_shader.override({color: hex_color("#964B00")}));
         //sun
         const sun_matrix = model_transform.times(Mat4.translation(-40,22,-50).times(Mat4.scale(5,5,5)));
+        //this.shapes.obstacle.draw(context,program_state, model_transform , this.materials.sun_shader.override({color: hex_color("#964B00")}));
         this.shapes.sun.draw(context,program_state, sun_matrix, this.materials.sun_shader);
 
         //target
