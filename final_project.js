@@ -88,6 +88,7 @@ export class Final_Project extends Scene {
         this.life_z = Math.floor(Math.random() * (15 + 1)) - 15;
         this.show_shield_block = true;
         this.show_life_block = true;
+        this.shield_active = false;
     }
 
 
@@ -129,6 +130,7 @@ export class Final_Project extends Scene {
             this.life_z = Math.floor(Math.random() * (15 + 1)) - 15;
             this.show_life_block = true;
             this.show_shield_block = true;
+            this.shield_active = false;
             if(this.lives === 0)
             {
                 console.log("dead");
@@ -145,6 +147,7 @@ export class Final_Project extends Scene {
         const hit_shield = () =>
         {
             this.show_shield_block = false;
+            this.shield_active = true;
         };
 
 
@@ -213,7 +216,7 @@ export class Final_Project extends Scene {
         let arrow_points = [arrow_tip_coord, arrow_setback1, arrow_setback2, arrow_setback3, arrow_setback4, arrow_setback5, arrow_endpoint_coord];
 
         //this.shapes.sun.draw(context,program_state, model_transform.times(Mat4.translation(0,-2,-0.4)).times(Mat4.scale(0.5,0.5,0.5)), this.materials.sun_shader);
-        if(arrow_tip_coord[1][0] <= -8.3 || arrow_endpoint_coord [1][0] <= -8.3)
+        if(arrow_tip_coord[1][0] <= -9.8 || arrow_endpoint_coord [1][0] <= -9.8)
         {
             console.log("Hit ground");
             reset_game();
@@ -485,48 +488,44 @@ export class Final_Project extends Scene {
         let distance_btwn_end_ob4 = Math.sqrt(Math.pow(ob4_coord[0][0] - arrow_endpoint_coord[0][0], 2) + Math.pow(ob4_coord[2][0] - arrow_endpoint_coord[2][0], 2));
 
         //console.log(distance_btwn_tip_ob1);
-        if(distance_btwn_tip_ob1 <= 0.5 || distance_btwn_tip_ob2 <= 0.5 || distance_btwn_tip_ob3 <= 0.5 || distance_btwn_tip_ob4 <= 0.5)
-        {
-            console.log("tip hit obstacle");
-            reset_game();
-            this.lives--;
+        if(!this.shield_active) {
+            if (distance_btwn_tip_ob1 <= 0.5 || distance_btwn_tip_ob2 <= 0.5 || distance_btwn_tip_ob3 <= 0.5 || distance_btwn_tip_ob4 <= 0.5) {
+                console.log("tip hit obstacle");
+                reset_game();
+                this.lives--;
+            }
+            if (distance_btwn_set1_ob1 <= 0.5 || distance_btwn_set1_ob2 <= 0.5 || distance_btwn_set1_ob3 <= 0.5 || distance_btwn_set1_ob4 <= 0.5) {
+                console.log("set1 hit obstacle");
+                reset_game();
+                this.lives--;
+            }
+            if (distance_btwn_set2_ob1 <= 0.5 || distance_btwn_set2_ob2 <= 0.5 || distance_btwn_set2_ob3 <= 0.5 || distance_btwn_set2_ob4 <= 0.5) {
+                console.log("set2 hit obstacle");
+                reset_game();
+                this.lives--;
+            }
+            if (distance_btwn_set3_ob1 <= 0.5 || distance_btwn_set3_ob2 <= 0.5 || distance_btwn_set3_ob3 <= 0.5 || distance_btwn_set3_ob4 <= 0.5) {
+                console.log("set3 hit obstacle");
+                reset_game();
+                this.lives--;
+            }
+            if (distance_btwn_set4_ob1 <= 0.5 || distance_btwn_set4_ob2 <= 0.5 || distance_btwn_set4_ob3 <= 0.5 || distance_btwn_set4_ob4 <= 0.5) {
+                console.log("set4 hit obstacle");
+                reset_game();
+                this.lives--;
+            }
+            if (distance_btwn_set5_ob1 <= 0.5 || distance_btwn_set5_ob2 <= 0.5 || distance_btwn_set5_ob3 <= 0.5 || distance_btwn_set5_ob4 <= 0.5) {
+                console.log("set4 hit obstacle");
+                reset_game();
+                this.lives--;
+            }
+            if (distance_btwn_end_ob1 <= 0.5 || distance_btwn_end_ob2 <= 0.5 || distance_btwn_end_ob3 <= 0.5 || distance_btwn_end_ob4 <= 0.5) {
+                console.log("end hit obstacle");
+                reset_game();
+                this.lives--;
+            }
         }
-        if(distance_btwn_set1_ob1 <= 0.5 || distance_btwn_set1_ob2 <= 0.5 || distance_btwn_set1_ob3 <= 0.5 || distance_btwn_set1_ob4 <= 0.5)
-        {
-            console.log("set1 hit obstacle");
-            reset_game();
-            this.lives--;
-        }
-        if(distance_btwn_set2_ob1 <= 0.5 || distance_btwn_set2_ob2 <= 0.5 || distance_btwn_set2_ob3 <= 0.5 || distance_btwn_set2_ob4 <= 0.5)
-        {
-            console.log("set2 hit obstacle");
-            reset_game();
-            this.lives--;
-        }
-        if(distance_btwn_set3_ob1 <= 0.5 || distance_btwn_set3_ob2 <= 0.5 || distance_btwn_set3_ob3 <= 0.5 || distance_btwn_set3_ob4 <= 0.5)
-        {
-            console.log("set3 hit obstacle");
-            reset_game();
-            this.lives--;
-        }
-        if(distance_btwn_set4_ob1 <= 0.5 || distance_btwn_set4_ob2 <= 0.5 || distance_btwn_set4_ob3 <= 0.5 || distance_btwn_set4_ob4 <= 0.5)
-        {
-            console.log("set4 hit obstacle");
-            reset_game();
-            this.lives--;
-        }
-        if(distance_btwn_set5_ob1 <= 0.5 || distance_btwn_set5_ob2 <= 0.5 || distance_btwn_set5_ob3 <= 0.5 || distance_btwn_set5_ob4 <= 0.5)
-        {
-            console.log("set4 hit obstacle");
-            reset_game();
-            this.lives--;
-        }
-        if(distance_btwn_end_ob1 <= 0.5 || distance_btwn_end_ob2 <= 0.5 || distance_btwn_end_ob3 <= 0.5 || distance_btwn_end_ob4 <= 0.5)
-        {
-            console.log("end hit obstacle");
-            reset_game();
-            this.lives--;
-        }
+
         this.shapes.obstacle.draw(context, program_state, obstacle_1, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
         this.shapes.obstacle.draw(context, program_state, obstacle_2, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
         this.shapes.obstacle.draw(context, program_state, obstacle_3, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
