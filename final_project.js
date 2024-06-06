@@ -51,7 +51,7 @@ export class Final_Project extends Scene {
             //        (Requirement 4)
 
             sun_shader: new Material(new defs.Phong_Shader(),
-                {ambient: 1, diffusivity: 1, color: hex_color('#ffff00')}),
+                {ambient: 1, diffusivity: 1, color: hex_color('#FFD700')}),
 
             grass_shader: new Material(new Textured_Phong(),
                {color: hex_color('#000000'),
@@ -65,7 +65,7 @@ export class Final_Project extends Scene {
                 }),
         }
 
-        this.shapes.cube.arrays.texture_coord = this.shapes.cube.arrays.texture_coord.map(x => x.times(70));
+        this.shapes.cube.arrays.texture_coord = this.shapes.cube.arrays.texture_coord.map(x => x.times(80));
         this.initial_camera_location = Mat4.look_at(vec3(0, 0, 20), vec3(0, 0, 0), vec3(0, 1, 0));
         this.period_denominator = 5;
         this.lives = 3;
@@ -78,6 +78,16 @@ export class Final_Project extends Scene {
         this.left = false;
         this.right = false;
         this.start_time = 0;
+        this.game_active = true;
+        this.arrow_speed = -7;
+        this.shield_1_x = Math.floor(Math.random() * (6 + 1)) - 3;
+        this.shield_1_y = Math.floor(Math.random() * (5 + 1)) - 3;
+        this.shield_1_z = Math.floor(Math.random() * (15 + 1)) - 15;
+        this.life_x = Math.floor(Math.random() * (6 + 1)) - 3;
+        this.life_y = Math.floor(Math.random() * (5 + 1)) - 3;
+        this.life_z = Math.floor(Math.random() * (15 + 1)) - 15;
+        this.show_shield_block = true;
+        this.show_life_block = true;
     }
 
 
@@ -105,63 +115,55 @@ export class Final_Project extends Scene {
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, .1, 1000);
 
-        
-        //this.shapes.obstacle.draw(context, program_state, model_transform, this.materials.sun_shader);
+        const reset_game = () =>
+        {
+            this.start = false;
+            program_state.set_camera(this.initial_camera_location);
+            this.y_angle = 0;
+            this.x_angle = 0;
+            this.shield_1_x = Math.floor(Math.random() * (6 + 1)) - 3;
+            this.shield_1_y = Math.floor(Math.random() * (5 + 1)) - 3;
+            this.shield_1_z = Math.floor(Math.random() * (15 + 1)) - 15;
+            this.life_x = Math.floor(Math.random() * (6 + 1)) - 3;
+            this.life_y = Math.floor(Math.random() * (5 + 1)) - 3;
+            this.life_z = Math.floor(Math.random() * (15 + 1)) - 15;
+            this.show_life_block = true;
+            this.show_shield_block = true;
+            if(this.lives === 0)
+            {
+                console.log("dead");
+                this.game_active = false;
+            }
+        };
 
-        // TODO: Create Planets (Requirement 1)
-        // this.shapes.[XXX].draw([XXX]) // <--example
+        const hit_life = () =>
+        {
+            this.show_life_block = false;
+            this.lives++;
+        };
+
+        const hit_shield = () =>
+        {
+            this.show_shield_block = false;
+        };
 
 
         // TODO:  Fill in matrix operations and drawing code to draw the solar system scene (Requirements 3 and 4)
 
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
-        const yellow = hex_color("#fac91a");
 
         const period = 10;
         const max_scale = 3;
         const min_scale = 1;
         const scale_offset = (max_scale + min_scale) / 2;
         const radius =  scale_offset + Math.sin(((2*Math.PI)/period) * t);
-        const sun_color_scale = (radius - min_scale)/(max_scale - min_scale);
-        const rgb = (1 + Math.sin(2 * Math.PI / 10 * t)) / 2;
-        const sun_color = color(
-            1,
-            rgb,
-            rgb,
-            1
-        );
 
         // TODO: Lighting (Requirement 2)
         const light_position = vec4(5, 5, 9999999, 1);
         // The parameters of the Light are: position, color, size
         program_state.lights = [new Light(light_position, hex_color("ffffff"), 10**radius)];
 
-        let sun_transform = model_transform.times(Mat4.scale(radius, radius, radius));
-        //this.shapes.torus.draw(context, program_state, model_transform, this.materials.test.override({color: yellow}));
-        //this.shapes.sun.draw(context, program_state, sun_transform, this.materials.sun_shader.override({color: sun_color}));
 
-        let p1_transform = model_transform.times(Mat4.translation(-1*5*Math.cos(t), 0, 5*Math.sin(t)));
-        let p2_transform = model_transform.times(Mat4.translation(-1*9*Math.cos(0.80*t), 0,9*Math.sin(0.80*t)));
-        let p3_transform = model_transform.times(Mat4.translation(-1*13*Math.cos(0.60*t), 0, 13*Math.sin(0.60*t)));
-        let p4_transform = model_transform.times(Mat4.translation(-1*17*Math.cos(0.40*t), 0, 17*Math.sin(0.40*t)));
-        let ring_transform = p3_transform.times(Mat4.scale(4.0, 4.0, 0.1));
-        let moon_transform = p4_transform.times(Mat4.translation(-2*Math.cos(1.2*t), 0, 2*Math.sin(1.2*t))).times(Mat4.scale(0.7,0.7,0.7));
-
-        let gray = hex_color("#808080");
-        let swampy_green_blue = hex_color("#80FFFF");
-        let muddy_brown_orange = hex_color("#B08040");
-        let soft_light_blue = hex_color("#ADD8E6");
-        //this.shapes.cylinder.draw(context,program_state, model_transform, this.materials.test.override({color: hex_color("ff0000")}));
-        let obstacle_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0)).times(Mat4.scale(1,1,25));
-        
-
-        let left_to_right_obstacle = obstacle_transform.times(Mat4.translation(15*Math.cos((Math.PI/this.period_denominator)*t), 0, 0 ));
-        let right_to_left_obstacle = obstacle_transform.times(Mat4.translation(-15*Math.cos((Math.PI/this.period_denominator)*t), 0, 0 ));
-
-        let obstacle_1 = left_to_right_obstacle.times(Mat4.translation(0,-5,0.3));
-        let obstacle_2 = right_to_left_obstacle.times(Mat4.translation(0,-10,0.3));
-        let obstacle_3 = left_to_right_obstacle.times(Mat4.translation(0,-15,0.3));
-        let obstacle_4 = right_to_left_obstacle.times(Mat4.translation(0,-20,0.3));
         //arrow
         let arrow_transform = model_transform;
         if(this.start)
@@ -186,92 +188,357 @@ export class Final_Project extends Scene {
                 this.y_angle -= Math.PI/180;
                 this.right = false;
             }
-            arrow_transform = arrow_transform.times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0)).times(Mat4.translation(0, 0, -3*(t- this.start_time)));
-            let camera_position = Mat4.inverse(arrow_transform.times(Mat4.translation(0,0,13)));
+            if(this.x_angle >= Math.PI/2)
+            {
+                arrow_transform = arrow_transform.times(Mat4.translation(0,-3*(t- this.start_time),0)).times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0))
+            }
+            else
+            {
+               arrow_transform = arrow_transform.times(Mat4.translation(0,-3*(t- this.start_time),0)).times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0)).times(Mat4.translation(0, 0, this.arrow_speed*(t- this.start_time)));
+            }
+            //arrow_transform = arrow_transform.times(Mat4.translation(0,-4*(t- this.start_time),0)).times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0)).times(Mat4.translation(0, 0, -4*(t- this.start_time)));
+            let camera_position = Mat4.inverse(arrow_transform.times(Mat4.translation(0,5,20)).times(Mat4.rotation(-Math.PI/10,1, 0, 0)));
             program_state.set_camera(camera_position);
         }
-        else
-        {
+        else {
             this.start_time = t;
         }
+        let arrow_tip_coord = arrow_transform.times([[0],[-2],[1.2],[1]]);
+        let arrow_setback1 = arrow_transform.times([[0],[-2],[2.4],[1]]);
+        let arrow_setback2 = arrow_transform.times([[0],[-2],[3.5],[1]]);
+        let arrow_setback3 = arrow_transform.times([[0],[-2],[4.6],[1]]);
+        let arrow_setback4 = arrow_transform.times([[0],[-2],[5.72],[1]]);
+        let arrow_setback5 = arrow_transform.times([[0],[-2],[6.85],[1]]);
+        let arrow_endpoint_coord = arrow_transform.times([[0],[-2],[8],[1]])
+        let arrow_points = [arrow_tip_coord, arrow_setback1, arrow_setback2, arrow_setback3, arrow_setback4, arrow_setback5, arrow_endpoint_coord];
 
-
-        let arrow_cone_transform = arrow_transform.times(Mat4.translation(0, -2, -3)).times(Mat4.rotation(Math.PI, 1, 0, 0)).times(Mat4.scale(0.4, 0.4, 0.8));
-        let arrow_body_transform = arrow_transform.times(Mat4.translation(0, -2, 0)).times(Mat4.scale(0.1, 0.1, 6));
+        //this.shapes.sun.draw(context,program_state, model_transform.times(Mat4.translation(0,-2,-0.4)).times(Mat4.scale(0.5,0.5,0.5)), this.materials.sun_shader);
+        if(arrow_tip_coord[1][0] <= -8.3 || arrow_endpoint_coord [1][0] <= -8.3)
+        {
+            console.log("Hit ground");
+            reset_game();
+            this.lives--;
+        }
+        let arrow_cone_transform = arrow_transform.times(Mat4.translation(0, -2, 2)).times(Mat4.scale(0.2, 0.2, 0.8)).times(Mat4.rotation(Math.PI, 1, 0, 0));
+        let arrow_body_transform = arrow_transform.times(Mat4.translation(0, -2, 5)).times(Mat4.scale(0.1, 0.1, 6));
         this.shapes.cone.draw(context,program_state, arrow_cone_transform, this.materials.sun_shader.override({color: hex_color("#B2B4B6")}));
         this.shapes.obstacle.draw(context,program_state, arrow_body_transform , this.materials.sun_shader.override({color: hex_color("#964B00")}));
+
         //sun
         const sun_matrix = model_transform.times(Mat4.translation(-40,22,-50).times(Mat4.scale(5,5,5)));
         //this.shapes.obstacle.draw(context,program_state, model_transform , this.materials.sun_shader.override({color: hex_color("#964B00")}));
         this.shapes.sun.draw(context,program_state, sun_matrix, this.materials.sun_shader);
 
         //target
-        this.shapes.sun.draw(context,program_state, (model_transform.times(Mat4.translation(0,0,-25)).times(Mat4.scale(1,1,0))), this.materials.obstacle_shader.override({color: hex_color("ff0000")}))
-        this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-25)).times(Mat4.scale(3,3,0))), this.materials.obstacle_shader.override({color: hex_color("00ff00")}));
-        this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-25))).times(Mat4.scale(5,5,0)), this.materials.obstacle_shader.override({color: hex_color("0000ff")}));
+        this.shapes.sun.draw(context,program_state, (model_transform.times(Mat4.translation(0,0,-24.991)).times(Mat4.scale(1,1,0))), this.materials.obstacle_shader.override({color: hex_color("ff0000")}))
+        this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-24.994)).times(Mat4.scale(3,3,0))), this.materials.obstacle_shader.override({color: hex_color("00ff00")}));
+        this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-24.997))).times(Mat4.scale(5,5,0)), this.materials.obstacle_shader.override({color: hex_color("0000ff")}));
         this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-25))).times(Mat4.scale(7,7,0)), this.materials.obstacle_shader.override({color: hex_color("000000")}));
+        //center (0,0,-25)
+        let distance_btwn_tip_center = Math.sqrt(Math.pow(0 - arrow_tip_coord[0][0], 2) + Math.pow(0 - arrow_tip_coord[1][0], 2));
+        if(distance_btwn_tip_center <= 7 && arrow_tip_coord[2][0] <= -26) {
+            console.log("Hit target");
+            this.score++;
+            if(distance_btwn_tip_center <= 5 )
+            {
+                this.score++;
+                if(distance_btwn_tip_center <= 3)
+                {
+                    this.score++;
+                    if(distance_btwn_tip_center <= 1)
+                    {
+                        this.score++;
+                    }
+                }
+            }
+            this.period_denominator -= 1;
+            this.arrow_speed--;
+            reset_game();
+        }
+        else if(arrow_tip_coord[2][0] <= -26)
+        {
+            this.lives--;
+            reset_game();
+        }
+
         //grass
         //this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(0,-10,6)).times(Mat4.scale(100,1,37)), this.materials.obstacle_shader.override({color: hex_color("04Af70")}));
-        this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(0,-10,6)).times(Mat4.scale(100,1,37)), this.materials.grass_shader);
+        let grass_transform = model_transform.times(Mat4.translation(0,-10,6)).times(Mat4.scale(100,1,37));
+        //console.log(grass_transform);
+        //this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(0,-9.5,0)), this.materials.sun_shader);
+        this.shapes.cube.draw(context, program_state,grass_transform, this.materials.grass_shader);
+
+        //Power-Ups and Shield
+        let cube_scale = 1;
+        let shield_1_transform = model_transform.times(Mat4.translation(this.shield_1_x, this.shield_1_y, this.shield_1_z)).times(Mat4.scale(cube_scale, cube_scale, cube_scale));
+        let life_up_transform = model_transform.times(Mat4.translation(this.life_x, this.life_y, this.life_z)).times(Mat4.scale(cube_scale, cube_scale, cube_scale));
+
+        //console.log(this.shield_1_x);
+        //console.log(arrow_points[0][1][0]);
+        //console.log(arrow_points[0][2][0]);
+        //console.log(this.shield_1_z - cube_scale);
+        //console.log(this.shield_1_x);
+        //console.log((this.shield_1_x - (cube_scale)) + " <= " + arrow_points[0][0][0] + " <= " + (this.shield_1_x + (cube_scale)));
+        //console.log((this.shield_1_y - cube_scale) + " <= " + arrow_points[0][1][0] + " <= " + (this.shield_1_y + cube_scale));
+        //console.log((this.shield_1_z - cube_scale) + " <= " + arrow_points[0][2][0] + " <= " + (this.shield_1_z + cube_scale));
+        if(this.show_shield_block) {
+            if ((this.shield_1_x - cube_scale) <= arrow_points[0][0][0] && arrow_points[0][0][0] <= (this.shield_1_x + cube_scale)) {
+                //console.log("tip align x");
+                if ((this.shield_1_y - cube_scale) <= arrow_points[0][1][0] && arrow_points[0][1][0] <= (this.shield_1_y + cube_scale)) {
+                    //console.log("tip align y");
+                    if ((this.shield_1_z - cube_scale) <= arrow_points[0][2][0] && arrow_points[0][2][0] <= (this.shield_1_z + cube_scale)) {
+                        console.log("Shield up hit");
+                        hit_shield();
+                    }
+                }
+            }
+
+            if (this.shield_1_x - cube_scale <= arrow_points[1][0][0] && arrow_points[1][0][0] <= this.shield_1_x + cube_scale) {
+                if (this.shield_1_y - cube_scale <= arrow_points[1][1][0] && arrow_points[1][1][0] <= this.shield_1_y + cube_scale) {
+                    if (this.shield_1_z - cube_scale <= arrow_points[1][2][0] && arrow_points[1][2][0] <= this.shield_1_z + cube_scale) {
+                        console.log("Shield up hit");
+                        hit_shield();
+                    }
+                }
+            }
+
+            if (this.shield_1_x - cube_scale <= arrow_points[2][0][0] && arrow_points[2][0][0] <= this.shield_1_x + cube_scale) {
+                if (this.shield_1_y - cube_scale <= arrow_points[2][1][0] && arrow_points[2][1][0] <= this.shield_1_y + cube_scale) {
+                    if (this.shield_1_z - cube_scale <= arrow_points[2][2][0] && arrow_points[2][2][0] <= this.shield_1_z + cube_scale) {
+                        console.log("Shield up hit");
+                        hit_shield();
+                    }
+                }
+            }
+
+            if (this.shield_1_x - cube_scale <= arrow_points[3][0][0] && arrow_points[3][0][0] <= this.shield_1_x + cube_scale) {
+                if (this.shield_1_y - cube_scale <= arrow_points[3][1][0] && arrow_points[3][1][0] <= this.shield_1_y + cube_scale) {
+                    if (this.shield_1_z - cube_scale <= arrow_points[3][2][0] && arrow_points[3][2][0] <= this.shield_1_z + cube_scale) {
+                        console.log("Shield up hit");
+                        hit_shield();
+                    }
+                }
+            }
+
+            if (this.shield_1_x - cube_scale <= arrow_points[4][0][0] && arrow_points[4][0][0] <= this.shield_1_x + cube_scale) {
+                if (this.shield_1_y - cube_scale <= arrow_points[4][1][0] && arrow_points[4][1][0] <= this.shield_1_y + cube_scale) {
+                    if (this.shield_1_z - cube_scale <= arrow_points[4][2][0] && arrow_points[4][2][0] <= this.shield_1_z + cube_scale) {
+                        console.log("Shield up hit");
+                        hit_shield();
+                    }
+                }
+            }
+
+            if (this.shield_1_x - cube_scale <= arrow_points[5][0][0] && arrow_points[5][0][0] <= this.shield_1_x + cube_scale) {
+                if (this.shield_1_y - cube_scale <= arrow_points[5][1][0] && arrow_points[5][1][0] <= this.shield_1_y + cube_scale) {
+                    if (this.shield_1_z - cube_scale <= arrow_points[5][2][0] && arrow_points[5][2][0] <= this.shield_1_z + cube_scale) {
+                        console.log("Shield up hit");
+                        hit_shield();
+                    }
+                }
+            }
+
+            if (this.shield_1_x - cube_scale <= arrow_points[6][0][0] && arrow_points[6][0][0] <= this.shield_1_x + cube_scale) {
+                if (this.shield_1_y - cube_scale <= arrow_points[6][1][0] && arrow_points[6][1][0] <= this.shield_1_y + cube_scale) {
+                    if (this.shield_1_z - cube_scale <= arrow_points[6][2][0] && arrow_points[6][2][0] <= this.shield_1_z + cube_scale) {
+                        console.log("Shield up hit");
+                        hit_shield();
+                    }
+                }
+            }
+            this.shapes.cube.draw(context, program_state, shield_1_transform, this.materials.obstacle_shader.override({color: hex_color("#FFFFFF")}));
+        }
+
+        /*
+        if(this.life_x - cube_scale <= lifept_x && lifept_x <= this.life_x + cube_scale)
+        {
+            if(this.life_y - cube_scale <= lifept_y && lifept_y <= this.life_y + cube_scale)
+            {
+                if(this.life_z - cube_scale <= lifept_z && lifept_z <= this.life_z + cube_scale)
+                {
+                    console.log("Life up hit");
+                    this.lives++;
+                }
+            }
+        }
+        */
+        if(this.show_life_block) {
+            if ((this.life_x - cube_scale) <= arrow_points[0][0][0] && arrow_points[0][0][0] <= (this.life_x + cube_scale)) {
+                //console.log("tip align x");
+                if ((this.life_y - cube_scale) <= arrow_points[0][1][0] && arrow_points[0][1][0] <= (this.life_y + cube_scale)) {
+                    //console.log("tip align y");
+                    if ((this.life_z - cube_scale) <= arrow_points[0][2][0] && arrow_points[0][2][0] <= (this.life_z + cube_scale)) {
+                        console.log("Life Up Hit");
+                        hit_life();
+                    }
+                }
+            }
+
+            if (this.life_x - cube_scale <= arrow_points[1][0][0] && arrow_points[1][0][0] <= this.life_x + cube_scale) {
+                if (this.life_y - cube_scale <= arrow_points[1][1][0] && arrow_points[1][1][0] <= this.life_y + cube_scale) {
+                    if (this.life_z - cube_scale <= arrow_points[1][2][0] && arrow_points[1][2][0] <= this.life_z + cube_scale) {
+                        console.log("Life Up Hit");
+                        hit_life();
+                    }
+                }
+            }
+
+            if (this.life_x - cube_scale <= arrow_points[2][0][0] && arrow_points[2][0][0] <= this.life_x + cube_scale) {
+                if (this.life_y - cube_scale <= arrow_points[2][1][0] && arrow_points[2][1][0] <= this.life_y + cube_scale) {
+                    if (this.life_z - cube_scale <= arrow_points[2][2][0] && arrow_points[2][2][0] <= this.life_z + cube_scale) {
+                        console.log("Life Up Hit");
+                        hit_life();
+                    }
+                }
+            }
+
+            if (this.life_x - cube_scale <= arrow_points[3][0][0] && arrow_points[3][0][0] <= this.life_x + cube_scale) {
+                if (this.life_y - cube_scale <= arrow_points[3][1][0] && arrow_points[3][1][0] <= this.life_y + cube_scale) {
+                    if (this.life_z - cube_scale <= arrow_points[3][2][0] && arrow_points[3][2][0] <= this.life_z + cube_scale) {
+                        console.log("Life Up Hit");
+                        hit_life();
+                    }
+                }
+            }
+
+            if (this.life_x - cube_scale <= arrow_points[4][0][0] && arrow_points[4][0][0] <= this.life_x + cube_scale) {
+                if (this.life_y - cube_scale <= arrow_points[4][1][0] && arrow_points[4][1][0] <= this.life_y + cube_scale) {
+                    if (this.life_z - cube_scale <= arrow_points[4][2][0] && arrow_points[4][2][0] <= this.life_z + cube_scale) {
+                        console.log("Life Up Hit");
+                        hit_life();
+                    }
+                }
+            }
+
+            if (this.life_x - cube_scale <= arrow_points[5][0][0] && arrow_points[5][0][0] <= this.life_x + cube_scale) {
+                if (this.life_y - cube_scale <= arrow_points[5][1][0] && arrow_points[5][1][0] <= this.life_y + cube_scale) {
+                    if (this.life_z - cube_scale <= arrow_points[5][2][0] && arrow_points[5][2][0] <= this.life_z + cube_scale) {
+                        console.log("Life Up Hit");
+                        hit_life();
+                    }
+                }
+            }
+
+            if (this.life_x - cube_scale <= arrow_points[6][0][0] && arrow_points[6][0][0] <= this.life_x + cube_scale) {
+                if (this.life_y - cube_scale <= arrow_points[6][1][0] && arrow_points[6][1][0] <= this.life_y + cube_scale) {
+                    if (this.life_z - cube_scale <= arrow_points[6][2][0] && arrow_points[6][2][0] <= this.life_z + cube_scale) {
+                        console.log("Life Up Hit");
+                        hit_life();
+                    }
+                }
+            }
+            this.shapes.cube.draw(context, program_state, life_up_transform, this.materials.obstacle_shader.override({color: hex_color("#800080")}));
+
+        }
+
+
+
+        //this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(2,2,2)), this.materials.obstacle_shader.override({color: hex_color("#FFFFFF")}));
 
         //obstacles
+        let obstacle_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0)).times(Mat4.scale(1,1,25));
+        let left_to_right_obstacle = obstacle_transform.times(Mat4.translation(15*Math.cos((Math.PI/this.period_denominator)*t), 0, 0 ));
+        let right_to_left_obstacle = obstacle_transform.times(Mat4.translation(-15*Math.cos((Math.PI/this.period_denominator)*t), 0, 0 ));
+        let obstacle_1 = left_to_right_obstacle.times(Mat4.translation(0,-5,0.3));
+        let obstacle_2 = right_to_left_obstacle.times(Mat4.translation(0,-10,0.3));
+        let obstacle_3 = left_to_right_obstacle.times(Mat4.translation(0,-15,0.3));
+        let obstacle_4 = right_to_left_obstacle.times(Mat4.translation(0,-20,0.3));
+
+        let ob1_coord = obstacle_1.times([[0],[0],[0],[1]]);
+        let ob2_coord = obstacle_2.times([[0],[0],[0],[1]]);
+        let ob3_coord = obstacle_3.times([[0],[0],[0],[1]]);
+        let ob4_coord = obstacle_4.times([[0],[0],[0],[1]]);
+
+        let distance_btwn_tip_ob1 = Math.sqrt(Math.pow(ob1_coord[0][0] - arrow_tip_coord[0][0], 2) + Math.pow(ob1_coord[2][0] - arrow_tip_coord[2][0], 2));
+        let distance_btwn_tip_ob2 = Math.sqrt(Math.pow(ob2_coord[0][0] - arrow_tip_coord[0][0], 2) + Math.pow(ob2_coord[2][0] - arrow_tip_coord[2][0], 2));
+        let distance_btwn_tip_ob3 = Math.sqrt(Math.pow(ob3_coord[0][0] - arrow_tip_coord[0][0], 2) + Math.pow(ob3_coord[2][0] - arrow_tip_coord[2][0], 2));
+        let distance_btwn_tip_ob4 = Math.sqrt(Math.pow(ob4_coord[0][0] - arrow_tip_coord[0][0], 2) + Math.pow(ob4_coord[2][0] - arrow_tip_coord[2][0], 2));
+
+        let distance_btwn_set1_ob1 = Math.sqrt(Math.pow(ob1_coord[0][0] - arrow_setback1[0][0], 2) + Math.pow(ob1_coord[2][0] - arrow_setback1[2][0], 2));
+        let distance_btwn_set1_ob2 = Math.sqrt(Math.pow(ob2_coord[0][0] - arrow_setback1[0][0], 2) + Math.pow(ob2_coord[2][0] - arrow_setback1[2][0], 2));
+        let distance_btwn_set1_ob3 = Math.sqrt(Math.pow(ob3_coord[0][0] - arrow_setback1[0][0], 2) + Math.pow(ob3_coord[2][0] - arrow_setback1[2][0], 2));
+        let distance_btwn_set1_ob4 = Math.sqrt(Math.pow(ob4_coord[0][0] - arrow_setback1[0][0], 2) + Math.pow(ob4_coord[2][0] - arrow_setback1[2][0], 2));
+
+        let distance_btwn_set2_ob1 = Math.sqrt(Math.pow(ob1_coord[0][0] - arrow_setback2[0][0], 2) + Math.pow(ob1_coord[2][0] - arrow_setback2[2][0], 2));
+        let distance_btwn_set2_ob2 = Math.sqrt(Math.pow(ob2_coord[0][0] - arrow_setback2[0][0], 2) + Math.pow(ob2_coord[2][0] - arrow_setback2[2][0], 2));
+        let distance_btwn_set2_ob3 = Math.sqrt(Math.pow(ob3_coord[0][0] - arrow_setback2[0][0], 2) + Math.pow(ob3_coord[2][0] - arrow_setback2[2][0], 2));
+        let distance_btwn_set2_ob4 = Math.sqrt(Math.pow(ob4_coord[0][0] - arrow_setback2[0][0], 2) + Math.pow(ob4_coord[2][0] - arrow_setback2[2][0], 2));
+
+        let distance_btwn_set3_ob1 = Math.sqrt(Math.pow(ob1_coord[0][0] - arrow_setback3[0][0], 2) + Math.pow(ob1_coord[2][0] - arrow_setback3[2][0], 2));
+        let distance_btwn_set3_ob2 = Math.sqrt(Math.pow(ob2_coord[0][0] - arrow_setback3[0][0], 2) + Math.pow(ob2_coord[2][0] - arrow_setback3[2][0], 2));
+        let distance_btwn_set3_ob3 = Math.sqrt(Math.pow(ob3_coord[0][0] - arrow_setback3[0][0], 2) + Math.pow(ob3_coord[2][0] - arrow_setback3[2][0], 2));
+        let distance_btwn_set3_ob4 = Math.sqrt(Math.pow(ob4_coord[0][0] - arrow_setback3[0][0], 2) + Math.pow(ob4_coord[2][0] - arrow_setback3[2][0], 2));
+
+        let distance_btwn_set4_ob1 = Math.sqrt(Math.pow(ob1_coord[0][0] - arrow_setback4[0][0], 2) + Math.pow(ob1_coord[2][0] - arrow_setback4[2][0], 2));
+        let distance_btwn_set4_ob2 = Math.sqrt(Math.pow(ob2_coord[0][0] - arrow_setback4[0][0], 2) + Math.pow(ob2_coord[2][0] - arrow_setback4[2][0], 2));
+        let distance_btwn_set4_ob3 = Math.sqrt(Math.pow(ob3_coord[0][0] - arrow_setback4[0][0], 2) + Math.pow(ob3_coord[2][0] - arrow_setback4[2][0], 2));
+        let distance_btwn_set4_ob4 = Math.sqrt(Math.pow(ob4_coord[0][0] - arrow_setback4[0][0], 2) + Math.pow(ob4_coord[2][0] - arrow_setback4[2][0], 2));
+
+        let distance_btwn_set5_ob1 = Math.sqrt(Math.pow(ob1_coord[0][0] - arrow_setback5[0][0], 2) + Math.pow(ob1_coord[2][0] - arrow_setback5[2][0], 2));
+        let distance_btwn_set5_ob2 = Math.sqrt(Math.pow(ob2_coord[0][0] - arrow_setback5[0][0], 2) + Math.pow(ob2_coord[2][0] - arrow_setback5[2][0], 2));
+        let distance_btwn_set5_ob3 = Math.sqrt(Math.pow(ob3_coord[0][0] - arrow_setback5[0][0], 2) + Math.pow(ob3_coord[2][0] - arrow_setback5[2][0], 2));
+        let distance_btwn_set5_ob4 = Math.sqrt(Math.pow(ob4_coord[0][0] - arrow_setback5[0][0], 2) + Math.pow(ob4_coord[2][0] - arrow_setback5[2][0], 2));
+
+        let distance_btwn_end_ob1 = Math.sqrt(Math.pow(ob1_coord[0][0] - arrow_endpoint_coord[0][0], 2) + Math.pow(ob1_coord[2][0] - arrow_endpoint_coord[2][0], 2));
+        let distance_btwn_end_ob2 = Math.sqrt(Math.pow(ob2_coord[0][0] - arrow_endpoint_coord[0][0], 2) + Math.pow(ob2_coord[2][0] - arrow_endpoint_coord[2][0], 2));
+        let distance_btwn_end_ob3 = Math.sqrt(Math.pow(ob3_coord[0][0] - arrow_endpoint_coord[0][0], 2) + Math.pow(ob3_coord[2][0] - arrow_endpoint_coord[2][0], 2));
+        let distance_btwn_end_ob4 = Math.sqrt(Math.pow(ob4_coord[0][0] - arrow_endpoint_coord[0][0], 2) + Math.pow(ob4_coord[2][0] - arrow_endpoint_coord[2][0], 2));
+
+        //console.log(distance_btwn_tip_ob1);
+        if(distance_btwn_tip_ob1 <= 0.5 || distance_btwn_tip_ob2 <= 0.5 || distance_btwn_tip_ob3 <= 0.5 || distance_btwn_tip_ob4 <= 0.5)
+        {
+            console.log("tip hit obstacle");
+            reset_game();
+            this.lives--;
+        }
+        if(distance_btwn_set1_ob1 <= 0.5 || distance_btwn_set1_ob2 <= 0.5 || distance_btwn_set1_ob3 <= 0.5 || distance_btwn_set1_ob4 <= 0.5)
+        {
+            console.log("set1 hit obstacle");
+            reset_game();
+            this.lives--;
+        }
+        if(distance_btwn_set2_ob1 <= 0.5 || distance_btwn_set2_ob2 <= 0.5 || distance_btwn_set2_ob3 <= 0.5 || distance_btwn_set2_ob4 <= 0.5)
+        {
+            console.log("set2 hit obstacle");
+            reset_game();
+            this.lives--;
+        }
+        if(distance_btwn_set3_ob1 <= 0.5 || distance_btwn_set3_ob2 <= 0.5 || distance_btwn_set3_ob3 <= 0.5 || distance_btwn_set3_ob4 <= 0.5)
+        {
+            console.log("set3 hit obstacle");
+            reset_game();
+            this.lives--;
+        }
+        if(distance_btwn_set4_ob1 <= 0.5 || distance_btwn_set4_ob2 <= 0.5 || distance_btwn_set4_ob3 <= 0.5 || distance_btwn_set4_ob4 <= 0.5)
+        {
+            console.log("set4 hit obstacle");
+            reset_game();
+            this.lives--;
+        }
+        if(distance_btwn_set5_ob1 <= 0.5 || distance_btwn_set5_ob2 <= 0.5 || distance_btwn_set5_ob3 <= 0.5 || distance_btwn_set5_ob4 <= 0.5)
+        {
+            console.log("set4 hit obstacle");
+            reset_game();
+            this.lives--;
+        }
+        if(distance_btwn_end_ob1 <= 0.5 || distance_btwn_end_ob2 <= 0.5 || distance_btwn_end_ob3 <= 0.5 || distance_btwn_end_ob4 <= 0.5)
+        {
+            console.log("end hit obstacle");
+            reset_game();
+            this.lives--;
+        }
         this.shapes.obstacle.draw(context, program_state, obstacle_1, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
         this.shapes.obstacle.draw(context, program_state, obstacle_2, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
         this.shapes.obstacle.draw(context, program_state, obstacle_3, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
         this.shapes.obstacle.draw(context, program_state, obstacle_4, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
 
+        //Text Display
         this.shapes.text.set_string("Super Archer", context.context);
         this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-7,10,-10).times(Mat4.scale(1,1,1))), this.materials.text_image);
         this.shapes.text.set_string("Score:" + this.score, context.context);
         this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-3,8,-10).times(Mat4.scale(0.75,0.75,0.75))), this.materials.text_image);
         this.shapes.text.set_string("Lives:" + this.lives, context.context);
         this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(14,10,-10).times(Mat4.scale(0.76,0.76,0.76))), this.materials.text_image);
-        //this.shapes.cylinder.draw(context, program_state, obstacle_1.times(Mat4.translation(0,-30,0)), this.materials.test.override({color: hex_color("ff0000")}));
-        //this.shapes.cylinder.draw(context,program_state, model_transform.times(Mat4.scale(2,2,1)), this.materials.test.override({color: hex_color("00ff00")}));
-
-        //this.shapes.cylinder.draw(context,program_state, model_transform.times(Mat4.scale(4,4,1)), this.materials.test.override({color: hex_color("ff0000")}));
-        //this.shapes.cylinder.draw(context,program_state, model_transform.times(Mat4.scale(6,6,1)), this.materials.test.override({color: hex_color("0000ff")}));
-        //this.shapes.cylinder.draw(context,program_state, model_transform.times(Mat4.scale(8,8,1)), this.materials.test.override({color: hex_color("000000")}));
-
-        //this.shapes.obstacle.draw(context, program_state, obstacle_transform, this.materials.obstacle_shader);
-
-
-        /*
-        this.shapes.planet1.draw(context, program_state, p1_transform, this.materials.planet1_shader);
-
-        if (Math.floor(t) % 2 === 1) {
-            this.shapes.planet2.draw(context, program_state, p2_transform, this.materials.planet2_shader_phong);
-            //this.shapes.planet2.draw(context, program_state, p2_transform, this.materials.planet2_shader_phong);
-        }
-        else {
-            //this.shapes.planet2.draw(context, program_state, p2_transform, this.materials.planet2_shader_gouraud);
-            this.shapes.planet2.draw(context, program_state, p2_transform, this.materials.planet2_shader_gouraud);
-        }
-
-        //this.shapes.planet2.draw(context, program_state, p2_transform, this.materials.test.override({color: swampy_green_blue}));
-        this.shapes.planet3.draw(context, program_state, p3_transform, this.materials.test.override({color: muddy_brown_orange}));
-        this.shapes.p3_ring.draw(context, program_state, ring_transform, this.materials.ring);
-        this.shapes.planet4.draw(context, program_state, p4_transform, this.materials.planet4_shader);
-        this.shapes.moon.draw(context, program_state, moon_transform, this.materials.moon_shader);
-
-        // camera operations
-        //this.default = Mat4.inverse(model_transform.times(Mat4.translation(0, 10, 20))
-        //    .times(Mat4.rotation(-0.46, 1, 0, 0)));
-        this.planet_1 = Mat4.inverse(p1_transform.times(Mat4.translation(0, 0, 5)));
-        this.planet_2 = Mat4.inverse(p2_transform.times(Mat4.translation(0, 0, 5)));
-        this.planet_3 = Mat4.inverse(p3_transform.times(Mat4.translation(0, 0, 5)));
-        this.planet_4 = Mat4.inverse(p4_transform.times(Mat4.translation(0, 0, 5)));
-        this.moon = Mat4.inverse(moon_transform.times(Mat4.translation(0, 0, 5)));
-        this.solar_system = this.initial_camera_location;
-
-        if (this.attached != undefined) {
-            //let desired = Mat4.inverse(this.attached().times(Mat4.translation(0, 0, 5)));
-            //program_state.camera_inverse = desired; Step 5
-            program_state.camera_inverse = this.attached().map((x,i) =>
-                Vector.from(program_state.camera_inverse[i]).mix(x, 0.1));
-        }
-
-         */
     }
 
 }
