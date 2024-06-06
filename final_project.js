@@ -52,6 +52,8 @@ export class Final_Project extends Scene {
 
             sun_shader: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1, color: hex_color('#FFD700')}),
+            cloud_shader: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 1, color: hex_color('#FFFFFF')}),
 
             grass_shader: new Material(new Textured_Phong(),
                {color: hex_color('#000000'),
@@ -82,10 +84,10 @@ export class Final_Project extends Scene {
         this.arrow_speed = -7;
         this.shield_1_x = Math.floor(Math.random() * (6 + 1)) - 3;
         this.shield_1_y = Math.floor(Math.random() * (5 + 1)) - 3;
-        this.shield_1_z = Math.floor(Math.random() * (15 + 1)) - 15;
+        this.shield_1_z = Math.floor(Math.random() * (10 + 1)) - 20;
         this.life_x = Math.floor(Math.random() * (6 + 1)) - 3;
         this.life_y = Math.floor(Math.random() * (5 + 1)) - 3;
-        this.life_z = Math.floor(Math.random() * (15 + 1)) - 15;
+        this.life_z = Math.floor(Math.random() * (10 + 1)) - 20;
         this.show_shield_block = true;
         this.show_life_block = true;
         this.shield_active = false;
@@ -133,10 +135,10 @@ export class Final_Project extends Scene {
             this.x_angle = 0;
             this.shield_1_x = Math.floor(Math.random() * (6 + 1)) - 3;
             this.shield_1_y = Math.floor(Math.random() * (5 + 1)) - 3;
-            this.shield_1_z = Math.floor(Math.random() * (15 + 1)) - 15;
+            this.shield_1_z = Math.floor(Math.random() * (10 + 1)) - 20;
             this.life_x = Math.floor(Math.random() * (6 + 1)) - 3;
             this.life_y = Math.floor(Math.random() * (5 + 1)) - 3;
-            this.life_z = Math.floor(Math.random() * (15 + 1)) - 15;
+            this.life_z = Math.floor(Math.random() * (10 + 1)) - 20;
             this.show_life_block = true;
             this.show_shield_block = true;
             this.shield_active = false;
@@ -159,6 +161,13 @@ export class Final_Project extends Scene {
             this.shield_active = true;
         };
 
+        const draw_cloud = (axis_transform) =>
+        {//sun_matrix.times(Mat4.translation(5,-1,-2))
+            this.shapes.cube.draw(context,program_state, axis_transform, this.materials.cloud_shader);
+            this.shapes.cube.draw(context,program_state, axis_transform.times(Mat4.translation(-1.6,-0.4,0)).times(Mat4.scale(0.6,0.6,1)), this.materials.cloud_shader);
+            this.shapes.cube.draw(context,program_state, axis_transform.times(Mat4.translation(1.6,-0.4,0)).times(Mat4.scale(0.6,0.6,1)), this.materials.cloud_shader);
+        };
+
 
         // TODO:  Fill in matrix operations and drawing code to draw the solar system scene (Requirements 3 and 4)
 
@@ -178,8 +187,90 @@ export class Final_Project extends Scene {
 
         //arrow
         let arrow_transform = model_transform;
+<<<<<<< Updated upstream
         if(this.game_active){
             if(this.lives === 0)
+=======
+        if(this.start)
+        {
+            if(this.up)
+            {
+                this.x_angle += Math.PI/180;
+                this.up = false;
+            }
+            if(this.down)
+            {
+                this.x_angle -= Math.PI/180;
+                this.down = false;
+            }
+            if(this.left)
+            {
+                this.y_angle += Math.PI/180;
+                this.left = false;
+            }
+            if(this.right)
+            {
+                this.y_angle -= Math.PI/180;
+                this.right = false;
+            }
+            if(this.x_angle >= Math.PI/2)
+            {
+                arrow_transform = arrow_transform.times(Mat4.translation(0,-3*(t- this.start_time),0)).times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0))
+            }
+            else
+            {
+               arrow_transform = arrow_transform.times(Mat4.translation(0,-3*(t- this.start_time),0)).times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0)).times(Mat4.translation(0, 0, this.arrow_speed*(t- this.start_time)));
+            }
+            //arrow_transform = arrow_transform.times(Mat4.translation(0,-4*(t- this.start_time),0)).times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0)).times(Mat4.translation(0, 0, -4*(t- this.start_time)));
+            let camera_position = Mat4.inverse(arrow_transform.times(Mat4.translation(0,5,20)).times(Mat4.rotation(-Math.PI/10,1, 0, 0)));
+            program_state.set_camera(camera_position);
+        }
+        else {
+            this.start_time = t;
+        }
+        let arrow_tip_coord = arrow_transform.times([[0],[-2],[1.2],[1]]);
+        let arrow_setback1 = arrow_transform.times([[0],[-2],[2.4],[1]]);
+        let arrow_setback2 = arrow_transform.times([[0],[-2],[3.5],[1]]);
+        let arrow_setback3 = arrow_transform.times([[0],[-2],[4.6],[1]]);
+        let arrow_setback4 = arrow_transform.times([[0],[-2],[5.72],[1]]);
+        let arrow_setback5 = arrow_transform.times([[0],[-2],[6.85],[1]]);
+        let arrow_endpoint_coord = arrow_transform.times([[0],[-2],[8],[1]])
+        let arrow_points = [arrow_tip_coord, arrow_setback1, arrow_setback2, arrow_setback3, arrow_setback4, arrow_setback5, arrow_endpoint_coord];
+
+        //this.shapes.sun.draw(context,program_state, model_transform.times(Mat4.translation(0,-2,-0.4)).times(Mat4.scale(0.5,0.5,0.5)), this.materials.sun_shader);
+        if(arrow_tip_coord[1][0] <= -9.8 || arrow_endpoint_coord [1][0] <= -9.8)
+        {
+            console.log("Hit ground");
+            reset_game();
+            this.lives--;
+        }
+        let arrow_cone_transform = arrow_transform.times(Mat4.translation(0, -2, 2)).times(Mat4.scale(0.2, 0.2, 0.8)).times(Mat4.rotation(Math.PI, 1, 0, 0));
+        let arrow_body_transform = arrow_transform.times(Mat4.translation(0, -2, 5)).times(Mat4.scale(0.1, 0.1, 6));
+        this.shapes.cone.draw(context,program_state, arrow_cone_transform, this.materials.sun_shader.override({color: hex_color("#B2B4B6")}));
+        this.shapes.obstacle.draw(context,program_state, arrow_body_transform , this.materials.sun_shader.override({color: hex_color("#964B00")}));
+
+        //sun and clouds
+        const sun_matrix = model_transform.times(Mat4.translation(-53,27,-85).times(Mat4.scale(15,15,10)));
+        //this.shapes.obstacle.draw(context,program_state, model_transform , this.materials.sun_shader.override({color: hex_color("#964B00")}));
+        this.shapes.sun.draw(context,program_state, sun_matrix, this.materials.sun_shader);
+        draw_cloud(model_transform.times(Mat4.translation(0,22,-50)).times(Mat4.translation(40*Math.cos((Math.PI/15)*t),2,-7)).times(Mat4.scale(5,5,4)));
+        draw_cloud(model_transform.times(Mat4.translation(0,22,-60)).times(Mat4.translation(-40*Math.cos((Math.PI/15)*t),1,-7)).times(Mat4.scale(5,5,4)));
+
+        //target
+        this.shapes.sun.draw(context,program_state, (model_transform.times(Mat4.translation(0,0,-24.991)).times(Mat4.scale(1,1,0))), this.materials.obstacle_shader.override({color: hex_color("ff0000")}))
+        this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-24.994)).times(Mat4.scale(3,3,0))), this.materials.obstacle_shader.override({color: hex_color("00ff00")}));
+        this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-24.997))).times(Mat4.scale(5,5,0)), this.materials.obstacle_shader.override({color: hex_color("0000ff")}));
+        this.shapes.sun.draw(context, program_state, (model_transform.times(Mat4.translation(0,0,-25))).times(Mat4.scale(7,7,0)), this.materials.obstacle_shader.override({color: hex_color("000000")}));
+        //center (0,0,-25)
+        let distance_btwn_tip_center = Math.sqrt(Math.pow(0 - arrow_tip_coord[0][0], 2) + Math.pow(0 - arrow_tip_coord[1][0], 2));
+        if(distance_btwn_tip_center <= 7 && arrow_tip_coord[2][0] <= -26) {
+            console.log("Hit target");
+            this.score++;
+            if(distance_btwn_tip_center <= 5 )
+            {
+                this.score++;
+                if(distance_btwn_tip_center <= 3)
+>>>>>>> Stashed changes
                 {
                     this.lives = 3;
                     this.score = 0;
