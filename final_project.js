@@ -185,6 +185,7 @@ export class Final_Project extends Scene {
                     this.score = 0;
                     reset_game();
                     this.period_denominator = 5;
+                    //comment
                 }
             if(this.start)
                 {
