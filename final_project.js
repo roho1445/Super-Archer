@@ -85,7 +85,7 @@ export class Final_Project extends Scene {
         this.right = false;
         this.start_time = 0;
         this.game_active = true;
-        this.arrow_speed = -7;
+        this.arrow_speed = -8;
         this.shield_1_x = Math.floor(Math.random() * (6 + 1)) - 3;
         this.shield_1_y = Math.floor(Math.random() * (5 + 1)) - 3;
         this.shield_1_z = Math.floor(Math.random() * (15 + 1)) - 15;
@@ -193,7 +193,7 @@ export class Final_Project extends Scene {
                 this.score = 0;
                 reset_game();
                 this.period_denominator = 5;
-                this.arrow_speed = -7;
+                this.arrow_speed = -8;
                 //comment
             }
             if(this.start)
@@ -245,7 +245,7 @@ export class Final_Project extends Scene {
                 if(this.lives <= 0)
                 {
                     this.game_active = false;
-                    this.arrow_speed = -7;
+                    this.arrow_speed = -8;
                 }
             }
             let arrow_cone_transform = arrow_transform.times(Mat4.translation(0, -2, 2)).times(Mat4.scale(0.2, 0.2, 0.8)).times(Mat4.rotation(Math.PI, 1, 0, 0));
@@ -295,7 +295,7 @@ export class Final_Project extends Scene {
                 {
                     this.period_denominator -= 1;
                 }
-                this.arrow_speed--;
+                this.arrow_speed -= 4;
                 reset_game();
             }
             else if(arrow_tip_coord[2][0] <= -26)
@@ -305,7 +305,7 @@ export class Final_Project extends Scene {
                 if(this.lives <= 0)
                 {
                     this.game_active = false;
-                    this.arrow_speed = -7;
+                    this.arrow_speed = -8;
                 }
                 return;
 
@@ -547,7 +547,7 @@ export class Final_Project extends Scene {
                     if(this.lives <= 0)
                     {
                         this.game_active = false;
-                        this.arrow_speed = -7;
+                        this.arrow_speed = -8;
                     }
                     return;
                 }
@@ -558,7 +558,7 @@ export class Final_Project extends Scene {
                     if(this.lives <= 0)
                     {
                         this.game_active = false;
-                        this.arrow_speed = -7;
+                        this.arrow_speed = -8;
                     }
                     return;
                 }
@@ -569,7 +569,7 @@ export class Final_Project extends Scene {
                     if(this.lives === 0)
                     {
                         this.game_active = false;
-                        this.arrow_speed = -7;
+                        this.arrow_speed = -8;
                     }
                     return;
                 }
@@ -580,7 +580,7 @@ export class Final_Project extends Scene {
                     if(this.lives <= 0)
                     {
                         this.game_active = false;
-                        this.arrow_speed = -7;
+                        this.arrow_speed = -8;
                     }
                     return;
                 }
@@ -591,7 +591,7 @@ export class Final_Project extends Scene {
                     if(this.lives <= 0)
                     {
                         this.game_active = false;
-                        this.arrow_speed = -7;
+                        this.arrow_speed = -8;
                     }
                     return;
                 }
@@ -602,7 +602,7 @@ export class Final_Project extends Scene {
                     if(this.lives <= 0)
                     {
                         this.game_active = false;
-                        this.arrow_speed = -7;
+                        this.arrow_speed = -8;
                     }
                     return;
                 }
@@ -613,7 +613,7 @@ export class Final_Project extends Scene {
                     if(this.lives <= 0)
                     {
                         this.game_active = false;
-                        this.arrow_speed = -7;
+                        this.arrow_speed = -8;
                     }
                     return;
                 }
