@@ -253,7 +253,7 @@ export class Final_Project extends Scene {
             this.shapes.cone.draw(context,program_state, arrow_cone_transform, this.materials.sun_shader.override({color: hex_color("#B2B4B6")}));
             this.shapes.obstacle.draw(context,program_state, arrow_body_transform , this.materials.sun_shader.override({color: hex_color("#964B00")}));
 
-            //sun
+            //sun and clouds
             const sun_matrix = model_transform.times(Mat4.translation(-53,27,-85).times(Mat4.scale(15,15,10)));
             //this.shapes.obstacle.draw(context,program_state, model_transform , this.materials.sun_shader.override({color: hex_color("#964B00")}));
             this.shapes.sun.draw(context,program_state, sun_matrix, this.materials.sun_shader);
@@ -283,7 +283,10 @@ export class Final_Project extends Scene {
                         }
                     }
                 }
-                this.period_denominator -= 1;
+                if(this.period_denominator > 1)
+                {
+                    this.period_denominator -= 1;
+                }
                 this.arrow_speed--;
                 reset_game();
             }
@@ -291,6 +294,11 @@ export class Final_Project extends Scene {
             {
                 this.lives--;
                 reset_game();
+                if(this.lives === 0)
+                {
+                    this.game_active = false;
+                }
+
             }
 
             //grass
@@ -584,9 +592,13 @@ export class Final_Project extends Scene {
             }
 
             this.shapes.obstacle.draw(context, program_state, obstacle_1, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
+            console.log("Obstacle 1 drawn");
             this.shapes.obstacle.draw(context, program_state, obstacle_2, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
+            console.log("Obstacle 2 drawn");
             this.shapes.obstacle.draw(context, program_state, obstacle_3, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
+            console.log("Obstacle 3 drawn");
             this.shapes.obstacle.draw(context, program_state, obstacle_4, this.materials.obstacle_shader.override({color: hex_color("ffa500")}));
+            console.log("Obstacle 4 drawn");
 
             //Text Display
             this.shapes.text.set_string("Super Archer", context.context);
@@ -600,6 +612,10 @@ export class Final_Project extends Scene {
             this.shapes.text.set_string("Game Over", context.context);
             this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-11,2,-10).times(Mat4.scale(2,2,2))), this.materials.text_image);
             //this.justDied = true;
+            this.shapes.text.set_string("Press 'b' to restart", context.context);
+            this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-13.2,-2,-10).times(Mat4.scale(1,1,1))), this.materials.text_image);
+            draw_cloud(model_transform.times(Mat4.translation(-15*Math.cos((Math.PI/10)*t),8,-15)).times(Mat4.scale(2,2,2)));
+            draw_cloud(model_transform.times(Mat4.translation(15*Math.cos((Math.PI/10)*t),9,-15)).times(Mat4.scale(2,2,2)));
         }
 
     }
