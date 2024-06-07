@@ -114,7 +114,7 @@ export class Final_Project extends Scene {
         // display():  Called once per frame of animation.
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
         if (!context.scratchpad.controls) {
-            //this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
+            this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
             // Define the global camera and projection matrices, which are stored in program_state.
             program_state.set_camera(this.initial_camera_location);
         }
@@ -214,14 +214,8 @@ export class Final_Project extends Scene {
                     this.y_angle -= Math.PI/180;
                     this.right = false;
                 }
-                if(this.x_angle >= Math.PI/2)
-                {
-                    arrow_transform = arrow_transform.times(Mat4.translation(0,-3*(t- this.start_time),0)).times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0))
-                }
-                else
-                {
-                    arrow_transform = arrow_transform.times(Mat4.translation(0,-3*(t- this.start_time),0)).times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0)).times(Mat4.translation(0, 0, this.arrow_speed*(t- this.start_time)));
-                }
+                this.x_angle -= Math.PI/1000;
+                arrow_transform = arrow_transform.times(Mat4.translation(0,-3*(t- this.start_time),0)).times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0)).times(Mat4.translation(0, 0, this.arrow_speed*(t- this.start_time)));
                 //arrow_transform = arrow_transform.times(Mat4.translation(0,-4*(t- this.start_time),0)).times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0)).times(Mat4.translation(0, 0, -4*(t- this.start_time)));
                 let camera_position = Mat4.inverse(arrow_transform.times(Mat4.translation(0,5,20)).times(Mat4.rotation(-Math.PI/10,1, 0, 0)));
                 program_state.set_camera(camera_position);
