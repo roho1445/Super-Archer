@@ -250,6 +250,14 @@ export class Final_Project extends Scene {
             }
             let arrow_cone_transform = arrow_transform.times(Mat4.translation(0, -2, 2)).times(Mat4.scale(0.2, 0.2, 0.8)).times(Mat4.rotation(Math.PI, 1, 0, 0));
             let arrow_body_transform = arrow_transform.times(Mat4.translation(0, -2, 5)).times(Mat4.scale(0.1, 0.1, 6));
+            if(arrow_endpoint_coord[2][0] <= this.shield_1_z - 1)
+                {
+                    this.show_shield_block = false;
+                }
+            if(arrow_endpoint_coord[2][0] <= this.life_z - 1)
+                {
+                    this.show_life_block = false;
+                }
             this.shapes.cone.draw(context,program_state, arrow_cone_transform, this.materials.sun_shader.override({color: hex_color("#B2B4B6")}));
             this.shapes.obstacle.draw(context,program_state, arrow_body_transform , this.materials.sun_shader.override({color: hex_color("#964B00")}));
 
