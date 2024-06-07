@@ -37,6 +37,7 @@ export class Final_Project extends Scene {
 
         this.images = {
             grass: "assets/grass_texture.png",
+            stone: "assets/stone_brick.png" , // from https://minecraft.fandom.com/wiki/List_of_block_textures#Ore
         };
 
         // *** Materials
@@ -54,7 +55,10 @@ export class Final_Project extends Scene {
                 {ambient: 1, diffusivity: 1, color: hex_color('#FFD700')}),
             cloud_shader: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1, color: hex_color('#FFFFFF')}),
-
+            wall_shader: new Material(new Textured_Phong(),
+                {color: hex_color('#000000'),
+                    ambient: 1, diffusivity: 0.1, specularity: 0.1,
+                    texture: new Texture(this.images.stone),}),
             grass_shader: new Material(new Textured_Phong(),
                 {color: hex_color('#000000'),
                     ambient: 1, diffusivity: 0.1, specularity: 0.1,
@@ -67,7 +71,7 @@ export class Final_Project extends Scene {
             }),
         }
 
-        this.shapes.cube.arrays.texture_coord = this.shapes.cube.arrays.texture_coord.map(x => x.times(80));
+        this.shapes.cube.arrays.texture_coord = this.shapes.cube.arrays.texture_coord.map(x => x.times(75));
         this.initial_camera_location = Mat4.look_at(vec3(0, 0, 20), vec3(0, 0, 0), vec3(0, 1, 0));
         this.period_denominator = 5;
         this.lives = 3;
@@ -298,6 +302,10 @@ export class Final_Project extends Scene {
                 return;
 
             }
+
+            //Surrounding walls
+            //let grass_transform = model_transform.times(Mat4.translation(0,-10,6)).times(Mat4.scale(100,1,37));
+            this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(1,-92,-26)).times(Mat4.scale(100,100,0)), this.materials.wall_shader);
 
             //grass
             //this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(0,-10,6)).times(Mat4.scale(100,1,37)), this.materials.obstacle_shader.override({color: hex_color("04Af70")}));
@@ -621,13 +629,18 @@ export class Final_Project extends Scene {
             this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(14,10,-10).times(Mat4.scale(0.76,0.76,0.76))), this.materials.text_image);
         }
         else{
+            //First line
             this.shapes.text.set_string("Game Over", context.context);
-            this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-11,2,-10).times(Mat4.scale(2,2,2))), this.materials.text_image);
-            //this.justDied = true;
+            this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-18,2,-10).times(Mat4.scale(3,3,3))), this.materials.text_image);
+            //Second line
             this.shapes.text.set_string("Press 'b' to restart", context.context);
-            this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-13.2,-2,-10).times(Mat4.scale(1,1,1))), this.materials.text_image);
-            draw_cloud(model_transform.times(Mat4.translation(-15*Math.cos((Math.PI/10)*t),8,-15)).times(Mat4.scale(2,2,2)));
-            draw_cloud(model_transform.times(Mat4.translation(15*Math.cos((Math.PI/10)*t),9,-15)).times(Mat4.scale(2,2,2)));
+            this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-14.2,-2,-10).times(Mat4.scale(1,1,1))), this.materials.text_image);
+
+            //background
+            this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(1,1,-15)).times(Mat4.scale(100,100,0)), this.materials.wall_shader);
+
+            //draw_cloud(model_transform.times(Mat4.translation(-15*Math.cos((Math.PI/10)*t),8,-15)).times(Mat4.scale(2,2,2)));
+            //draw_cloud(model_transform.times(Mat4.translation(15*Math.cos((Math.PI/10)*t),9,-15)).times(Mat4.scale(2,2,2)));
         }
 
     }
