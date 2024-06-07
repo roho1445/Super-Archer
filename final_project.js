@@ -114,7 +114,7 @@ export class Final_Project extends Scene {
         // display():  Called once per frame of animation.
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
         if (!context.scratchpad.controls) {
-            this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
+            //this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
             // Define the global camera and projection matrices, which are stored in program_state.
             program_state.set_camera(this.initial_camera_location);
         }
@@ -189,6 +189,7 @@ export class Final_Project extends Scene {
                 this.score = 0;
                 reset_game();
                 this.period_denominator = 5;
+                this.arrow_speed = -7;
                 //comment
             }
             if(this.start)
@@ -246,6 +247,7 @@ export class Final_Project extends Scene {
                 if(this.lives === 0)
                 {
                     this.game_active = false;
+                    this.arrow_speed = -7;
                 }
             }
             let arrow_cone_transform = arrow_transform.times(Mat4.translation(0, -2, 2)).times(Mat4.scale(0.2, 0.2, 0.8)).times(Mat4.rotation(Math.PI, 1, 0, 0));
@@ -297,6 +299,7 @@ export class Final_Project extends Scene {
                 if(this.lives === 0)
                 {
                     this.game_active = false;
+                    this.arrow_speed = -7;
                 }
 
             }
@@ -533,6 +536,7 @@ export class Final_Project extends Scene {
                     if(this.lives === 0)
                     {
                         this.game_active = false;
+                        this.arrow_speed = -7;
                     }
                 }
                 if (distance_btwn_set1_ob1 <= 0.5 || distance_btwn_set1_ob2 <= 0.5 || distance_btwn_set1_ob3 <= 0.5 || distance_btwn_set1_ob4 <= 0.5) {
@@ -542,6 +546,7 @@ export class Final_Project extends Scene {
                     if(this.lives === 0)
                     {
                         this.game_active = false;
+                        this.arrow_speed = -7;
                     }
                 }
                 if (distance_btwn_set2_ob1 <= 0.5 || distance_btwn_set2_ob2 <= 0.5 || distance_btwn_set2_ob3 <= 0.5 || distance_btwn_set2_ob4 <= 0.5) {
@@ -551,6 +556,7 @@ export class Final_Project extends Scene {
                     if(this.lives === 0)
                     {
                         this.game_active = false;
+                        this.arrow_speed = -7;
                     }
                 }
                 if (distance_btwn_set3_ob1 <= 0.5 || distance_btwn_set3_ob2 <= 0.5 || distance_btwn_set3_ob3 <= 0.5 || distance_btwn_set3_ob4 <= 0.5) {
@@ -560,6 +566,7 @@ export class Final_Project extends Scene {
                     if(this.lives === 0)
                     {
                         this.game_active = false;
+                        this.arrow_speed = -7;
                     }
                 }
                 if (distance_btwn_set4_ob1 <= 0.5 || distance_btwn_set4_ob2 <= 0.5 || distance_btwn_set4_ob3 <= 0.5 || distance_btwn_set4_ob4 <= 0.5) {
@@ -569,6 +576,7 @@ export class Final_Project extends Scene {
                     if(this.lives === 0)
                     {
                         this.game_active = false;
+                        this.arrow_speed = -7;
                     }
                 }
                 if (distance_btwn_set5_ob1 <= 0.5 || distance_btwn_set5_ob2 <= 0.5 || distance_btwn_set5_ob3 <= 0.5 || distance_btwn_set5_ob4 <= 0.5) {
@@ -578,6 +586,7 @@ export class Final_Project extends Scene {
                     if(this.lives === 0)
                     {
                         this.game_active = false;
+                        this.arrow_speed = -7;
                     }
                 }
                 if (distance_btwn_end_ob1 <= 0.5 || distance_btwn_end_ob2 <= 0.5 || distance_btwn_end_ob3 <= 0.5 || distance_btwn_end_ob4 <= 0.5) {
@@ -587,6 +596,7 @@ export class Final_Project extends Scene {
                     if(this.lives === 0)
                     {
                         this.game_active = false;
+                        this.arrow_speed = -7;
                     }
                 }
             }
