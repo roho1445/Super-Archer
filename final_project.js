@@ -1,7 +1,5 @@
 import {defs, tiny} from './examples/common.js';
 import {Text_Line} from './examples/text-demo.js';
-//import {Texture} from "./tiny-graphics";
-//import {Texture} from './tiny-graphics';
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
@@ -16,41 +14,20 @@ export class Final_Project extends Scene {
 
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
         this.shapes = {
-            torus: new defs.Torus(15, 15),
-            torus2: new defs.Torus(3, 15),
-            sphere: new defs.Subdivision_Sphere(4),
-            circle: new defs.Regular_2D_Polygon(1, 15),
-            // TODO:  Fill in as many additional shape instances as needed in this key/value table.
-            //        (Requirement 1)
-            p3_ring: new defs.Torus(50, 50),
             sun: new defs.Subdivision_Sphere(4),
-            planet1: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(2),
-            planet2: new defs.Subdivision_Sphere(2),
-            planet3: new defs.Subdivision_Sphere(3),
-            planet4: new defs.Subdivision_Sphere(4),
-            moon: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(1),
             obstacle: new defs.Rounded_Capped_Cylinder(15, 15,  [[0, 15], [0, 15]]),
             cube: new defs.Cube(),
             cone: new defs.Closed_Cone(15,15,[[0,15],[0,15]]),
-            text: new Text_Line(40),
+            text: new Text_Line(40), //Text form text-demo.js
         };
 
         this.images = {
-            grass: "assets/grass_texture.png",
+            grass: "assets/grass_texture.png", // from https://minecraft.fandom.com/wiki/List_of_block_textures#Ore
             stone: "assets/stone_brick.png" , // from https://minecraft.fandom.com/wiki/List_of_block_textures#Ore
         };
 
         // *** Materials
         this.materials = {
-            test: new Material(new defs.Phong_Shader(),
-                {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#ffffff")}),
-            test2: new Material(new Gouraud_Shader(),
-                {ambient: .4, diffusivity: .6, color: hex_color("#992828")}),
-            ring: new Material(new Ring_Shader(),
-                {ambient: 1, diffusivity: 1, color: hex_color('#b08040'), specularity: 1}),
-            // TODO:  Fill in as many additional material objects as needed in this key/value table.
-            //        (Requirement 4)
-
             sun_shader: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1, color: hex_color('#FFD700')}),
             cloud_shader: new Material(new defs.Phong_Shader(),
@@ -85,18 +62,17 @@ export class Final_Project extends Scene {
         this.right = false;
         this.start_time = 0;
         this.game_active = true;
-        this.arrow_speed = -8;
+        this.arrow_speed = -9
         this.shield_1_x = Math.floor(Math.random() * (6 + 1)) - 3;
-        this.shield_1_y = Math.floor(Math.random() * (5 + 1)) - 3;
+        this.shield_1_y = Math.floor(Math.random() * (2 + 1)) - 1;
         this.shield_1_z = Math.floor(Math.random() * (15 + 1)) - 15;
         this.life_x = Math.floor(Math.random() * (6 + 1)) - 3;
-        this.life_y = Math.floor(Math.random() * (5 + 1)) - 3;
+        this.life_y = Math.floor(Math.random() * (2 + 1)) - 1;
         this.life_z = Math.floor(Math.random() * (15 + 1)) - 15;
         this.show_shield_block = true;
         this.show_life_block = true;
         this.shield_active = false;
         this.game_active = true;
-        this.justDied = false;
     }
 
 
@@ -133,19 +109,14 @@ export class Final_Project extends Scene {
             this.y_angle = 0;
             this.x_angle = 0;
             this.shield_1_x = Math.floor(Math.random() * (6 + 1)) - 3;
-            this.shield_1_y = Math.floor(Math.random() * (5 + 1)) - 3;
+            this.shield_1_y = Math.floor(Math.random() * (2 + 1)) - 1;
             this.shield_1_z = Math.floor(Math.random() * (15 + 1)) - 15;
             this.life_x = Math.floor(Math.random() * (6 + 1)) - 3;
-            this.life_y = Math.floor(Math.random() * (5 + 1)) - 3;
+            this.life_y = Math.floor(Math.random() * (2 + 1)) - 1;
             this.life_z = Math.floor(Math.random() * (15 + 1)) - 15;
             this.show_life_block = true;
             this.show_shield_block = true;
             this.shield_active = false;
-            //if(this.lives === 0)
-            //{
-            //console.log("dead");
-            //this.game_active = false;
-            //}
         };
 
         const draw_cloud = (axis_transform) =>
@@ -168,8 +139,6 @@ export class Final_Project extends Scene {
         };
 
 
-        // TODO:  Fill in matrix operations and drawing code to draw the solar system scene (Requirements 3 and 4)
-
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
 
         const period = 10;
@@ -178,7 +147,7 @@ export class Final_Project extends Scene {
         const scale_offset = (max_scale + min_scale) / 2;
         const radius =  scale_offset + Math.sin(((2*Math.PI)/period) * t);
 
-        // TODO: Lighting (Requirement 2)
+
         const light_position = vec4(5, 5, 9999999, 1);
         // The parameters of the Light are: position, color, size
         program_state.lights = [new Light(light_position, hex_color("ffffff"), 10**radius)];
@@ -193,34 +162,36 @@ export class Final_Project extends Scene {
                 this.score = 0;
                 reset_game();
                 this.period_denominator = 5;
-                this.arrow_speed = -8;
-                //comment
+                this.arrow_speed = -9;
             }
+            if(this.up)
+            {
+                this.x_angle += Math.PI/150;
+                this.up = false;
+            }
+            if(this.down)
+            {
+                this.x_angle -= Math.PI/150;
+                this.down = false;
+            }
+            if(this.left)
+            {
+                this.y_angle += Math.PI/150;
+                this.left = false;
+            }
+            if(this.right)
+            {
+                this.y_angle -= Math.PI/150;
+                this.right = false;
+            }
+            arrow_transform = arrow_transform.times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0));
             if(this.start)
             {
-                if(this.up)
+                if((t -this.start_time) > 0.5)
                 {
-                    this.x_angle += Math.PI/180;
-                    this.up = false;
+                    this.x_angle -= Math.PI/1500;
                 }
-                if(this.down)
-                {
-                    this.x_angle -= Math.PI/180;
-                    this.down = false;
-                }
-                if(this.left)
-                {
-                    this.y_angle += Math.PI/180;
-                    this.left = false;
-                }
-                if(this.right)
-                {
-                    this.y_angle -= Math.PI/180;
-                    this.right = false;
-                }
-                this.x_angle -= Math.PI/1000;
                 arrow_transform = arrow_transform.times(Mat4.translation(0,-3*(t- this.start_time),0)).times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0)).times(Mat4.translation(0, 0, this.arrow_speed*(t- this.start_time)));
-                //arrow_transform = arrow_transform.times(Mat4.translation(0,-4*(t- this.start_time),0)).times(Mat4.rotation(this.y_angle, 0, 1, 0)).times(Mat4.rotation(this.x_angle, 1, 0, 0)).times(Mat4.translation(0, 0, -4*(t- this.start_time)));
                 let camera_position = Mat4.inverse(arrow_transform.times(Mat4.translation(0,5,20)).times(Mat4.rotation(-Math.PI/10,1, 0, 0)));
                 program_state.set_camera(camera_position);
             }
@@ -236,7 +207,6 @@ export class Final_Project extends Scene {
             let arrow_endpoint_coord = arrow_transform.times([[0],[-2],[8],[1]])
             let arrow_points = [arrow_tip_coord, arrow_setback1, arrow_setback2, arrow_setback3, arrow_setback4, arrow_setback5, arrow_endpoint_coord];
 
-            //this.shapes.sun.draw(context,program_state, model_transform.times(Mat4.translation(0,-2,-0.4)).times(Mat4.scale(0.5,0.5,0.5)), this.materials.sun_shader);
             if(arrow_tip_coord[1][0] <= -9.8 || arrow_endpoint_coord [1][0] <= -9.8)
             {
                 console.log("Hit ground");
@@ -245,7 +215,7 @@ export class Final_Project extends Scene {
                 if(this.lives <= 0)
                 {
                     this.game_active = false;
-                    this.arrow_speed = -8;
+                    this.arrow_speed = -9
                 }
             }
             let arrow_cone_transform = arrow_transform.times(Mat4.translation(0, -2, 2)).times(Mat4.scale(0.2, 0.2, 0.8)).times(Mat4.rotation(Math.PI, 1, 0, 0));
@@ -263,7 +233,6 @@ export class Final_Project extends Scene {
 
             //sun and clouds
             const sun_matrix = model_transform.times(Mat4.translation(-53,27,-85).times(Mat4.scale(15,15,10)));
-            //this.shapes.obstacle.draw(context,program_state, model_transform , this.materials.sun_shader.override({color: hex_color("#964B00")}));
             this.shapes.sun.draw(context,program_state, sun_matrix, this.materials.sun_shader);
             draw_cloud(model_transform.times(Mat4.translation(0,22,-50)).times(Mat4.translation(40*Math.cos((Math.PI/15)*t),2,-7)).times(Mat4.scale(5,5,4)));
             draw_cloud(model_transform.times(Mat4.translation(0,22,-60)).times(Mat4.translation(-40*Math.cos((Math.PI/15)*t),1,-7)).times(Mat4.scale(5,5,4)));
@@ -305,21 +274,17 @@ export class Final_Project extends Scene {
                 if(this.lives <= 0)
                 {
                     this.game_active = false;
-                    this.arrow_speed = -8;
+                    this.arrow_speed = -9
                 }
                 return;
 
             }
 
             //Surrounding walls
-            //let grass_transform = model_transform.times(Mat4.translation(0,-10,6)).times(Mat4.scale(100,1,37));
             this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(1,-92,-26)).times(Mat4.scale(100,100,0)), this.materials.wall_shader);
 
             //grass
-            //this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(0,-10,6)).times(Mat4.scale(100,1,37)), this.materials.obstacle_shader.override({color: hex_color("04Af70")}));
             let grass_transform = model_transform.times(Mat4.translation(0,-10,6)).times(Mat4.scale(100,1,37));
-            //console.log(grass_transform);
-            //this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(0,-9.5,0)), this.materials.sun_shader);
             this.shapes.cube.draw(context, program_state,grass_transform, this.materials.grass_shader);
 
             //Power-Ups and Shield
@@ -327,19 +292,9 @@ export class Final_Project extends Scene {
             let shield_1_transform = model_transform.times(Mat4.translation(this.shield_1_x, this.shield_1_y, this.shield_1_z)).times(Mat4.scale(cube_scale, cube_scale, cube_scale));
             let life_up_transform = model_transform.times(Mat4.translation(this.life_x, this.life_y, this.life_z)).times(Mat4.scale(cube_scale, cube_scale, cube_scale));
 
-            //console.log(this.shield_1_x);
-            //console.log(arrow_points[0][1][0]);
-            //console.log(arrow_points[0][2][0]);
-            //console.log(this.shield_1_z - cube_scale);
-            //console.log(this.shield_1_x);
-            //console.log((this.shield_1_x - (cube_scale)) + " <= " + arrow_points[0][0][0] + " <= " + (this.shield_1_x + (cube_scale)));
-            //console.log((this.shield_1_y - cube_scale) + " <= " + arrow_points[0][1][0] + " <= " + (this.shield_1_y + cube_scale));
-            //console.log((this.shield_1_z - cube_scale) + " <= " + arrow_points[0][2][0] + " <= " + (this.shield_1_z + cube_scale));
             if(this.show_shield_block) {
                 if ((this.shield_1_x - cube_scale) <= arrow_points[0][0][0] && arrow_points[0][0][0] <= (this.shield_1_x + cube_scale)) {
-                    //console.log("tip align x");
                     if ((this.shield_1_y - cube_scale) <= arrow_points[0][1][0] && arrow_points[0][1][0] <= (this.shield_1_y + cube_scale)) {
-                        //console.log("tip align y");
                         if ((this.shield_1_z - cube_scale) <= arrow_points[0][2][0] && arrow_points[0][2][0] <= (this.shield_1_z + cube_scale)) {
                             console.log("Shield up hit");
                             hit_shield();
@@ -403,19 +358,6 @@ export class Final_Project extends Scene {
                 this.shapes.cube.draw(context, program_state, shield_1_transform, this.materials.obstacle_shader.override({color: hex_color("#FFFFFF")}));
             }
 
-            /*
-            if(this.life_x - cube_scale <= lifept_x && lifept_x <= this.life_x + cube_scale)
-            {
-                if(this.life_y - cube_scale <= lifept_y && lifept_y <= this.life_y + cube_scale)
-                {
-                    if(this.life_z - cube_scale <= lifept_z && lifept_z <= this.life_z + cube_scale)
-                    {
-                        console.log("Life up hit");
-                        this.lives++;
-                    }
-                }
-            }
-            */
             if(this.show_life_block) {
                 if ((this.life_x - cube_scale) <= arrow_points[0][0][0] && arrow_points[0][0][0] <= (this.life_x + cube_scale)) {
                     //console.log("tip align x");
@@ -485,10 +427,6 @@ export class Final_Project extends Scene {
 
             }
 
-
-
-            //this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(2,2,2)), this.materials.obstacle_shader.override({color: hex_color("#FFFFFF")}));
-
             //obstacles
             let obstacle_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0)).times(Mat4.scale(1,1,25));
             let left_to_right_obstacle = obstacle_transform.times(Mat4.translation(15*Math.cos((Math.PI/this.period_denominator)*t), 0, 0 ));
@@ -538,7 +476,6 @@ export class Final_Project extends Scene {
             let distance_btwn_end_ob3 = Math.sqrt(Math.pow(ob3_coord[0][0] - arrow_endpoint_coord[0][0], 2) + Math.pow(ob3_coord[2][0] - arrow_endpoint_coord[2][0], 2));
             let distance_btwn_end_ob4 = Math.sqrt(Math.pow(ob4_coord[0][0] - arrow_endpoint_coord[0][0], 2) + Math.pow(ob4_coord[2][0] - arrow_endpoint_coord[2][0], 2));
 
-            //console.log(distance_btwn_tip_ob1);
             if(!this.shield_active) {
                 if (distance_btwn_tip_ob1 <= 0.5 || distance_btwn_tip_ob2 <= 0.5 || distance_btwn_tip_ob3 <= 0.5 || distance_btwn_tip_ob4 <= 0.5) {
                     console.log("tip hit obstacle");
@@ -547,7 +484,7 @@ export class Final_Project extends Scene {
                     if(this.lives <= 0)
                     {
                         this.game_active = false;
-                        this.arrow_speed = -8;
+                        this.arrow_speed = -9
                     }
                     return;
                 }
@@ -558,7 +495,7 @@ export class Final_Project extends Scene {
                     if(this.lives <= 0)
                     {
                         this.game_active = false;
-                        this.arrow_speed = -8;
+                        this.arrow_speed = -9
                     }
                     return;
                 }
@@ -569,7 +506,7 @@ export class Final_Project extends Scene {
                     if(this.lives === 0)
                     {
                         this.game_active = false;
-                        this.arrow_speed = -8;
+                        this.arrow_speed = -9
                     }
                     return;
                 }
@@ -580,7 +517,7 @@ export class Final_Project extends Scene {
                     if(this.lives <= 0)
                     {
                         this.game_active = false;
-                        this.arrow_speed = -8;
+                        this.arrow_speed = -9
                     }
                     return;
                 }
@@ -591,7 +528,7 @@ export class Final_Project extends Scene {
                     if(this.lives <= 0)
                     {
                         this.game_active = false;
-                        this.arrow_speed = -8;
+                        this.arrow_speed = -9
                     }
                     return;
                 }
@@ -602,7 +539,7 @@ export class Final_Project extends Scene {
                     if(this.lives <= 0)
                     {
                         this.game_active = false;
-                        this.arrow_speed = -8;
+                        this.arrow_speed = -9
                     }
                     return;
                 }
@@ -613,7 +550,7 @@ export class Final_Project extends Scene {
                     if(this.lives <= 0)
                     {
                         this.game_active = false;
-                        this.arrow_speed = -8;
+                        this.arrow_speed = -9
                     }
                     return;
                 }
@@ -636,23 +573,20 @@ export class Final_Project extends Scene {
             this.shapes.text.set_string("Lives:" + this.lives, context.context);
             this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(14,10,-10).times(Mat4.scale(0.76,0.76,0.76))), this.materials.text_image);
         }
-        else{
+        else //Draw the Game Over Screen Here
+        {
             //First line
             this.shapes.text.set_string("Game Over", context.context);
             this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-18,2,-10).times(Mat4.scale(3,3,3))), this.materials.text_image);
+
             //Second line
             this.shapes.text.set_string("Press 'b' to restart", context.context);
             this.shapes.text.draw(context, program_state, model_transform.times(Mat4.translation(-14.2,-2,-10).times(Mat4.scale(1,1,1))), this.materials.text_image);
 
             //background
             this.shapes.cube.draw(context, program_state,model_transform.times(Mat4.translation(1,1,-15)).times(Mat4.scale(100,100,0)), this.materials.wall_shader);
-
-            //draw_cloud(model_transform.times(Mat4.translation(-15*Math.cos((Math.PI/10)*t),8,-15)).times(Mat4.scale(2,2,2)));
-            //draw_cloud(model_transform.times(Mat4.translation(15*Math.cos((Math.PI/10)*t),9,-15)).times(Mat4.scale(2,2,2)));
         }
-
     }
-
 }
 
 class Gouraud_Shader extends Shader {
